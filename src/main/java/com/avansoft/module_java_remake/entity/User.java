@@ -1,106 +1,122 @@
 package com.avansoft.module_java_remake.entity;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.*;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "users", schema = "module_test")
+@Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 191)
     private String name;
-
-    @Column(name = "email", nullable = false, length = 191)
     private String email;
-
-    @Lob
-    @Column(name = "emailTitle")
-    private String emailTitle;
-
-    @Lob
-    @Column(name = "emailNote")
-    private String emailNote;
-
-    @Column(name = "email_verified_at")
-    private Instant emailVerifiedAt;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "remember_token", length = 100)
-    private String rememberToken;
-
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
-
-    @Column(name = "level")
-    private Integer level;
-
-    @Column(name = "status")
-    private Integer status;
-
-    @Column(name = "user_id")
-    private String userId;
-
-    @Lob
-    @Column(name = "address")
     private String address;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    @Lob
-    @Column(name = "job")
-    private String job;
+    public User() {}
 
-    @Lob
-    @Column(name = "note")
-    private String note;
+    private User(UserBuilder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.email = builder.email;
+        this.address = builder.address;
+        this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt;
+    }
 
-    @Column(name = "phone")
-    private String phone;
+    public Long getId() {
+        return id;
+    }
 
-    @Column(name = "referer_id")
-    private String refererId;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    @Column(name = "detail_address")
-    private String detailAddress;
+    public String getName() {
+        return name;
+    }
 
-    @Column(name = "google_id")
-    private String googleId;
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    @Column(name = "facebook_id")
-    private String facebookId;
+    public String getEmail() {
+        return email;
+    }
 
-    @Column(name = "naver_id")
-    private String naverId;
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    @Column(name = "kakao_id")
-    private String kakaoId;
+    public String getAddress() {
+        return address;
+    }
 
-    @Column(name = "apple_id")
-    private String appleId;
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-    @Column(name = "zipcode")
-    private String zipcode;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    @Lob
-    @Column(name = "withdrawal_reason")
-    private String withdrawalReason;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    @Column(name = "withdrawal_date")
-    private Instant withdrawalDate;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
-    @Column(name = "deleted_at")
-    private Instant deletedAt;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
+    public static class UserBuilder {
+        private Long id;
+        private String name;
+        private String email;
+        private String address;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+
+
+        public UserBuilder setId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public UserBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public UserBuilder setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UserBuilder setAddress(String address) {
+            this.address = address;
+            return this;
+        }
+
+        public UserBuilder setCreatedAt(LocalDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public UserBuilder setUpdatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public User build() {
+            return new User(this);
+        }
+    }
 }
