@@ -1,6 +1,7 @@
 package com.avansoft.module_java_remake.service;
 
 import com.avansoft.module_java_remake.entity.User;
+import java.util.Optional;
 
 public class UserServiceDecorator implements IUserService {
     protected UserServiceImpl decoratedUserService;
@@ -15,7 +16,7 @@ public class UserServiceDecorator implements IUserService {
     }
 
     @Override
-    public User getUserById(Long id) {
+    public Optional<User> getUserById(Long id) {
         return decoratedUserService.getUserById(id);
     }
 
@@ -28,5 +29,14 @@ public class UserServiceDecorator implements IUserService {
     public void deleteUser(Long id) {
         decoratedUserService.deleteUser(id);
     }
-}
 
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return decoratedUserService.findByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findByPhone(String phone) {
+        return decoratedUserService.findByPhone(phone);
+    }
+}
