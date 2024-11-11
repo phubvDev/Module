@@ -1,12 +1,11 @@
 package com.avansoft.module_java_remake.controller;
 
+import com.avansoft.module_java_remake.dto.BoardDTO;
+import com.avansoft.module_java_remake.entity.Board;
 import com.avansoft.module_java_remake.response.CoreResponse;
 import com.avansoft.module_java_remake.service.IBoardService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/avansoft/module/boards")
@@ -21,6 +20,11 @@ public class BoardController {
     @GetMapping
     public CoreResponse<?> getBoards() {
         return boardService.getAllBoards();
+    }
+
+    @PostMapping("/addboard")
+    public CoreResponse<?> addBoard(@RequestBody BoardDTO boardDTO) {
+        return boardService.addBoard(boardDTO);
     }
 
     @GetMapping("/{id}")

@@ -39,10 +39,10 @@ public class Board {
 //    @JoinColumn(name = "manager_id",referencedColumnName = "id",foreignKey = @ForeignKey(name = "boards_manager_id_foreign"))
 //    private User manager;
 
-    @Column(name = "read")
+    @Column(name = "`read`")
     private Byte read;
 
-    @Column(name = "write")
+    @Column(name = "`write`")
     private Byte write;
 
     @Column(name = "membership_system", nullable = false, columnDefinition = "tinyint(1) default 0")
