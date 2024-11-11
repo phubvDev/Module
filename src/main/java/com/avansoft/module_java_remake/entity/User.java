@@ -31,6 +31,12 @@ public class User {
     @Email
     private String email;
 
+    @Lob
+    private String emailTitle;  // longtext
+
+    @Lob
+    private String emailNote;  // longtext
+
     @Size(min = 8)
     @ToString.Exclude
     private String password;
@@ -41,44 +47,56 @@ public class User {
     private int status;
 
     @NotNull
+    @Column(name = "user_id")
     private String userId;
 
+    @Lob
     private String address;
+
+    @Lob
     private String job;
+
+    @Lob
     private String note;
+
     private String phone;
+
+    @Column(name = "referer_id")
+    private String refererId;
+
+    @Column(name = "detail_address")
     private String detailAddress;
-    private String zipcode;
-    private String withdrawalReason;
 
-    @Embedded
-    private SocialAccounts socialAccounts;
-
-    private LocalDateTime emailVerifiedAt;
-    private LocalDateTime withdrawalDate;
-    private LocalDateTime deletedAt;
-
-    @ManyToOne
-    @JoinColumn(name = "referer_id")
-    private User referer;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-}
-
-@Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-class SocialAccounts {
     private String googleId;
     private String facebookId;
     private String naverId;
     private String kakaoId;
     private String appleId;
+
+    private String zipcode;
+
+    @Column(name = "withdrawal_reason")
+    @Lob
+    private String withdrawalReason;
+
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
+    @Column(name = "withdrawal_date")
+    private LocalDateTime withdrawalDate;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "referer_id", insertable = false, updatable = false)
+    private User referer;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

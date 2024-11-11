@@ -1,27 +1,38 @@
 package com.avansoft.module_java_remake.service;
 
-import com.avansoft.module_java_remake.entity.User;
+import com.avansoft.module_java_remake.dto.UserDTO;
+import com.avansoft.module_java_remake.factory.UserFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.List;
 
+@Service
+@Qualifier("userServiceDecorator")
 public class UserServiceDecorator implements IUserService {
-    protected UserServiceImpl decoratedUserService;
 
-    public UserServiceDecorator(UserServiceImpl userService) {
+    protected final UserServiceImpl decoratedUserService;
+    private final UserFactory userFactory;
+
+    @Autowired
+    public UserServiceDecorator(UserServiceImpl userService, UserFactory userFactory) {
         this.decoratedUserService = userService;
+        this.userFactory = userFactory;
     }
 
     @Override
-    public User createUser(User user) {
-        return decoratedUserService.createUser(user);
+    public UserDTO createUser(UserDTO userDTO) {
+        return decoratedUserService.createUser(userDTO);
     }
 
     @Override
-    public Optional<User> getUserById(Long id) {
+    public Optional<UserDTO> getUserById(Long id) {
         return decoratedUserService.getUserById(id);
     }
 
     @Override
-    public User updateUser(Long id, User userDetails) {
+    public UserDTO updateUser(Long id, UserDTO userDetails) {
         return decoratedUserService.updateUser(id, userDetails);
     }
 
@@ -31,12 +42,22 @@ public class UserServiceDecorator implements IUserService {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public void hardDeleteUser(Long id) {
+        decoratedUserService.hardDeleteUser(id);
+    }
+
+    @Override
+    public Optional<UserDTO> findByEmail(String email) {
         return decoratedUserService.findByEmail(email);
     }
 
     @Override
-    public Optional<User> findByPhone(String phone) {
+    public Optional<UserDTO> findByPhone(String phone) {
         return decoratedUserService.findByPhone(phone);
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        return decoratedUserService.getAllUsers();
     }
 }
