@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/avansoft/module/users")
+@RequestMapping("${API_BASE_URL}/users")
 public class UserController {
 
     private final IUserService userService;

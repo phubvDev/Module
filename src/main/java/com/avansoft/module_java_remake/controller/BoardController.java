@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/avansoft/module/boards")
+@RequestMapping("${API_BASE_URL}/boards")
 public class BoardController {
     private final IBoardService boardService;
 
@@ -17,7 +17,7 @@ public class BoardController {
         this.boardService = boardService;
     }
 
-    @GetMapping
+    @GetMapping()
     public CoreResponse<?> getBoards() {
         return boardService.getAllBoards();
     }
