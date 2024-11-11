@@ -22,14 +22,26 @@ public class BoardController {
         return boardService.getAllBoards();
     }
 
+    @GetMapping("/{id}")
+    public CoreResponse<?> getBoardById(@PathVariable("id") Long id) {
+        System.out.println("Board: " + boardService.getBoardById(id).data.toString());
+        return boardService.getBoardById(id);
+    }
+
+
     @PostMapping("/addboard")
     public CoreResponse<?> addBoard(@RequestBody BoardDTO boardDTO) {
         return boardService.addBoard(boardDTO);
     }
 
-    @GetMapping("/{id}")
-    public CoreResponse<?> getBoardById(@PathVariable("id") Long id) {
-        return boardService.getBoardById(id);
+    @PutMapping("/editboard/{id}")
+    public CoreResponse<?> editBoard(@PathVariable("id") Long id, @RequestBody BoardDTO boardDTO) {
+        return boardService.updateBoard(id,boardDTO);
+    }
+
+    @DeleteMapping("/deleteboard/{id}")
+    public CoreResponse<?> deleteBoard(@PathVariable("id") Long id) {
+        return boardService.deleteBoardById(id);
     }
 
 }

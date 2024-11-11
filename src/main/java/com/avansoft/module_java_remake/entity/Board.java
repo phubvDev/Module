@@ -35,9 +35,9 @@ public class Board {
     @Column(name = "preface_text",columnDefinition = "TEXT")
     private String prefaceText;
 
-//    @ManyToOne
-//    @JoinColumn(name = "manager_id",referencedColumnName = "id",foreignKey = @ForeignKey(name = "boards_manager_id_foreign"))
-//    private User manager;
+    @ManyToOne
+    @JoinColumn(name = "manager_id",referencedColumnName = "id",foreignKey = @ForeignKey(name = "boards_manager_id_foreign"))
+    private User manager;
 
     @Column(name = "`read`")
     private Byte read;
@@ -62,7 +62,7 @@ public class Board {
                 ", updatedAt=" + updatedAt +
                 ", preface=" + preface +
                 ", prefaceText='" + prefaceText + '\'' +
-//                ", managerId=" + manager +
+                ", managerId=" + manager +
                 ", read=" + read +
                 ", write=" + write +
                 ", membershipSystem=" + membershipSystem +

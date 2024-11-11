@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class BoardDTO {
     private Long id;
     private String boardId;
@@ -23,4 +24,6 @@ public class BoardDTO {
     private Byte write;
     private Boolean membershipSystem;
     private Byte status;
+
+
 }
