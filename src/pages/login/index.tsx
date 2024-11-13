@@ -1,6 +1,6 @@
-
 import { Button, Input, Form } from 'antd';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import Logo from '../../assets/images/logo.png';
 
 function Login() {
@@ -17,8 +17,9 @@ function Login() {
                     <Form.Item label="아이디" style={{ marginBottom: '16px' }}>
                         <Input className="ant-input ant-input-lg" id="exampleInputEmail1" placeholder="아이디를 입력해주세요" />
                     </Form.Item>
-                    <Form.Item label="비밀번호" style={{ marginBottom: '16px' }}>
+                    <Form.Item label="비밀번호" style={{ marginBottom: '16px'}}>
                         <Input.Password
+                            style={{ height: 40 }}
                             id="password"
                             className="ant-input ant-input-lg"
                             placeholder="비밀번호를 입력해주세요"
@@ -29,9 +30,9 @@ function Login() {
                         로그인
                     </Button>
                     <div className="text-center" style={{ marginTop: '8px' }}>
-                        <a href="./find-id.html" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>아이디 찾기</a> |
-                        <a href="./find-password.html" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>비밀번호 찾기</a> |
-                        <a href="./register.html" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>회원가입</a>
+                        <Link to="/module/findid" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>아이디 찾기</Link> |
+                        <Link to="/module/forgotpassword" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>비밀번호 찾기</Link> |
+                        <Link to="/module/register" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>회원가입</Link>
                     </div>
                 </Form>
 
@@ -41,7 +42,7 @@ function Login() {
                     <Button type="primary" danger size="small" style={{ width: '100%', marginBottom: '8px' }}>Google</Button>
                     <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#1ec800', color: '#fff' }}>Naver</Button>
                     <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#fee500', color: '#000' }}>Kakao</Button>
-                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px' }}>Apple</Button>
+                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#6c757d', color: '#fff'}}>Apple</Button>
                 </div>
 
                 <div className="copyright" style={{ marginTop: '16px' }}>

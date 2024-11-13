@@ -1,0 +1,18 @@
+.wrapper {
+    text-align: center;
+    padding: 20px;
+}
+
+.logoLink {
+    display: block;
+    margin: 20px 0;
+}
+
+.subtitle {
+    margin-bottom: 20px;
+}
+
+.formContainer {
+    max-width: 500px;
+    margin: auto;
+}
