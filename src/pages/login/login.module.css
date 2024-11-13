@@ -1,140 +1,167 @@
-/* Login.module.css */
-
+/* Wrapper for the entire login component */
 .wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
     padding: 20px;
-    background-color: #f8f9fa;
+    background-color: #f7f9fc;
+    min-height: 100vh;
 }
 
+/* Logo section styling */
 .logo {
-    margin-bottom: 20px;
+    display: block;
+    margin: 20px 0;
+    text-align: center;
 }
 
+/* Title and subtitle styling */
 .title {
-    font-size: 2rem;
-    font-weight: bold;
+    font-size: 24px;
+    font-weight: 700;
     margin-bottom: 10px;
 }
 
 .subtitle {
-    font-size: 1.2rem;
+    font-size: 14px;
+    color: #6c757d;
     margin-bottom: 20px;
 }
 
+/* Form wrapper for center alignment and max width */
 .formWrapper {
-    max-width: 500px;
     width: 100%;
-    background: #ffffff;
+    max-width: 400px;
+    background-color: #ffffff;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.form {
-    width: 100%;
-}
-
+/* Form group styling */
 .formGroup {
     margin-bottom: 20px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 0;
 }
 
 .passwordWrapper {
     position: relative;
 }
 
+/* Toggle password button styling */
 .togglePassword {
     position: absolute;
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    background: transparent;
-    border: none;
+    color: #333333;
 }
 
-.btn {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
+.togglePassword:hover {
+    color: #5d9cec;
 }
 
+/* Form control styling */
+.form-control {
+    height: 45px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    color: #333333;
+}
+
+.form-control:focus {
+    border-color: #5d9cec;
+    box-shadow: 0 0 5px rgba(93, 156, 236, 0.3);
+}
+
+/* Login button styling */
 .btn-dark {
-    background-color: #343a40;
-    color: #ffffff;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    color: #ffffff;
-}
-
-.btn-danger {
-    background-color: #dc3545;
-    color: #ffffff;
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: #ffffff;
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    color: #ffffff;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: #ffffff;
-}
-
-.links {
-    margin-top: 10px;
-}
-
-.socialLogin {
-    margin-top: 20px;
-}
-
-.socialLogin button {
-    margin-bottom: 10px;
-}
-
-.socialLogin h3 {
+    background-color: #333333; /* Darker color to match HTML example */
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    height: 45px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    border: none;
     margin-bottom: 15px;
 }
 
-.copyright {
-    margin-top: 30px;
-    font-size: 0.9rem;
+.btn-dark:hover {
+    background-color: #222222;
+}
+
+/* Links below the login form */
+.links a {
+    color: #5d9cec;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+/* Social login buttons */
+.socialLogin h3 {
+    margin: 20px 0;
+    font-size: 14px;
+    color: #333333;
+}
+
+.socialLogin .btn {
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.socialLogin .btn-primary {
+    background-color: #1877f2;
+}
+
+.socialLogin .btn-primary:hover {
+    background-color: #155dbf;
+}
+
+.socialLogin .btn-danger {
+    background-color: #db4437;
+}
+
+.socialLogin .btn-danger:hover {
+    background-color: #c23325;
+}
+
+.socialLogin .btn-success {
+    background-color: #34a853;
+}
+
+.socialLogin .btn-success:hover {
+    background-color: #2d8c45;
+}
+
+.socialLogin .btn-warning {
+    background-color: #fbbc05;
+}
+
+.socialLogin .btn-warning:hover {
+    background-color: #e2a800;
+}
+
+.socialLogin .btn-secondary {
+    background-color: #333333;
+}
+
+.socialLogin .btn-secondary:hover {
+    background-color: #222222;
+}
+
+/* Copyright text */
+.copyright p {
+    font-size: 14px;
     color: #6c757d;
-}
-
-.text-muted {
-    color: #6c757d !important;
-}
-
-.text-center {
-    text-align: center !important;
-}
-
-.lead {
-    font-size: 1.25rem;
-    font-weight: 300;
+    margin-top: 20px;
 }

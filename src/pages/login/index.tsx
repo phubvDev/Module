@@ -1,88 +1,55 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { loginService } from '../../services/loginService.ts';
-import styles from './Login.module.css';
 
-const Login: React.FC = () => {
-    const [username, setUsername] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-    const navigate = useNavigate();
+import { Button, Input, Form } from 'antd';
+import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import Logo from '../../assets/images/logo.png';
 
-    const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        try {
-            const response = await loginService(username, password);
-            console.log('Login successful:', response.data);
-            navigate('/module');
-        } catch (error) {
-            console.error('Error logging in:', error);
-        }
-    };
-
+function Login() {
     return (
-        <div className={styles.wrapper}>
-            <a href="/" className={`${styles.logo} my-5 d-block`}>
-                <img src="/assets/logo.png" alt="Colla DEV Logo" style={{ maxWidth: '250px' }} />
+        <div className="wrapper" style={{ padding: '16px', textAlign: 'center' }}>
+            <a href="#" style={{ display: 'block', margin: '40px 0' }}>
+                <img src={Logo} alt="Logo" style={{ maxWidth: '250px' }} />
             </a>
-            <h1 className={styles.title}><b>로그인</b></h1>
-            <p className={`${styles.subtitle} text-muted lead`}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-            <div className={styles.formWrapper}>
-                <form className={`${styles.form} text-left my-4`} onSubmit={handleLogin}>
-                    <div className={`${styles.formGroup} form-group mb-4`}>
-                        <label htmlFor="exampleInputEmail1">아이디</label>
-                        <input
-                            type="text"
-                            className="form-control form-control-lg rounded-0"
-                            id="exampleInputEmail1"
-                            placeholder="아이디를 입력해주세요"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
-                    <div className={`${styles.formGroup} form-group mb-4`}>
-                        <label htmlFor="exampleInputPassword1">비밀번호</label>
-                        <div className={styles.passwordWrapper}>
-                            <input
-                                type={passwordVisible ? 'text' : 'password'}
-                                id="password"
-                                className="form-control form-control-lg rounded-0"
-                                placeholder="비밀번호를 입력해주세요"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                className={`${styles.togglePassword} btn btn-default btn-lg bg-transparent border-0`}
-                                onClick={() => setPasswordVisible(!passwordVisible)}
-                            >
-                                {passwordVisible ? <i className="fas fa-eye"></i> : <i className="fas fa-eye-slash"></i>}
-                            </button>
-                        </div>
-                    </div>
-                    <button type="submit" className="btn btn-block btn-dark btn-flat btn-lg">로그인</button>
-                    <div className={`${styles.links} text-center mt-2`}>
-                        <a href="/find-id" className="text-muted px-2">아이디 찾기</a> |
-                        <a href="/find-password" className="text-muted px-2">비밀번호 찾기</a> |
-                        <a href="/register" className="text-muted px-2">회원가입</a>
-                    </div>
-                </form>
+            <h1><b>로그인</b></h1>
+            <p style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: '16px' }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 
-                <div className={styles.socialLogin}>
+            <div style={{ maxWidth: '500px', width: '100%', margin: 'auto' }}>
+                <Form layout="vertical" style={{ margin: '32px 0' }}>
+                    <Form.Item label="아이디" style={{ marginBottom: '16px' }}>
+                        <Input className="ant-input ant-input-lg" id="exampleInputEmail1" placeholder="아이디를 입력해주세요" />
+                    </Form.Item>
+                    <Form.Item label="비밀번호" style={{ marginBottom: '16px' }}>
+                        <Input.Password
+                            id="password"
+                            className="ant-input ant-input-lg"
+                            placeholder="비밀번호를 입력해주세요"
+                            iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
+                        />
+                    </Form.Item>
+                    <Button type="primary" size="large" style={{ width: '100%' }}>
+                        로그인
+                    </Button>
+                    <div className="text-center" style={{ marginTop: '8px' }}>
+                        <a href="./find-id.html" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>아이디 찾기</a> |
+                        <a href="./find-password.html" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>비밀번호 찾기</a> |
+                        <a href="./register.html" style={{ color: 'rgba(0, 0, 0, 0.45)', padding: '0 8px' }}>회원가입</a>
+                    </div>
+                </Form>
+
+                <div className="social-login">
                     <h3 className="text-center">or</h3>
-                    <button type="button" className="btn btn-block btn-primary btn-sm btn-flat">Facebook</button>
-                    <button type="button" className="btn btn-block btn-danger btn-sm btn-flat">Google</button>
-                    <button type="button" className="btn btn-block btn-success btn-sm btn-flat">Naver</button>
-                    <button type="button" className="btn btn-block btn-warning btn-sm btn-flat">Kakao</button>
-                    <button type="button" className="btn btn-block btn-secondary btn-sm btn-flat">Apple</button>
+                    <Button type="primary" size="small" style={{ width: '100%', marginBottom: '8px' }}>Facebook</Button>
+                    <Button type="primary" danger size="small" style={{ width: '100%', marginBottom: '8px' }}>Google</Button>
+                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#1ec800', color: '#fff' }}>Naver</Button>
+                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#fee500', color: '#000' }}>Kakao</Button>
+                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px' }}>Apple</Button>
                 </div>
 
-                <div className={styles.copyright}>
-                    <p className="text-center">&copy; Colla soft. All rights reserved.</p>
+                <div className="copyright" style={{ marginTop: '16px' }}>
+                    <p className="text-center">©Colla soft. All rights reserved.</p>
                 </div>
             </div>
         </div>
     );
-};
+}
 
 export default Login;
