@@ -1,0 +1,25 @@
+.container {
+    overflow: auto;
+    height: 100vh;
+    position: fixed;
+    inset-inline-start: 0;
+    top: 0;
+    bottom: 0;
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+}
+.row {
+    padding:16px 24px;
+    border-bottom:1px solid #dee2e65e !important;
+    height:64px;
+    cursor: pointer;
+}
+.text {
+    font-size: 20px;
+    color: white;
+    font-weight: 300;
+}
+:global(.ant-menu-item-icon) {
+    min-width: 16px !important;
+    font-size: 16px !important;
+}

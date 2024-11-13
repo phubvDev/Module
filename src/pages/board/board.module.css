@@ -1,0 +1,11 @@
+.container {
+    margin-top: 24px;
+}
+
+:global(.ant-table-cell) {
+    text-align: center !important;
+}
+.row {
+    text-align: center;
+    cursor: pointer;
+}
