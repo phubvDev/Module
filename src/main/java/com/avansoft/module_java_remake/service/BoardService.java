@@ -103,8 +103,18 @@ public class BoardService implements IBoardService {
         }
     }
 
+    @Transactional
     @Override
     public CoreResponse<?> addBoard(BoardDTO boardDTO) {
+        //check trùng lặp boardId
+        if (boardRepository.existsByBoardId(boardDTO.getBoardId())) {
+            return CoreResponse.builder()
+                    .code(HttpStatus.CONFLICT.value())
+                    .message("Board ID already exists")
+                    .data(null)
+                    .build();
+        }
+
         try {
             User manager = userRepository.findById(boardDTO.getManagerId())
                     .orElse(null);

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IBoardRepository extends JpaRepository<Board,Long> {
+    boolean existsByBoardId(String boardId);
 }
