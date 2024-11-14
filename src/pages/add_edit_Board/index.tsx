@@ -6,9 +6,11 @@ const {Option} = Select;
 import styles from './addeditboard.module.css';
 import {redColor, teal} from "../../const/colors.ts";
 import {addBoard, deleteBoard, updateBoard} from "../../services/boardService.ts";
+import {useGetBoards} from "../../context/GetBoardsContext.tsx";
 
 const AddorEditBoardPage: React.FC = () => {
     const navigate = useNavigate();
+    const {getBoards} = useGetBoards();
     const location = useLocation();
     const [isPrefaceEnabled, setIsPrefaceEnabled] = useState(true);
     const [form] = Form.useForm();
@@ -30,9 +32,11 @@ const AddorEditBoardPage: React.FC = () => {
             if (mode === 'create') {
                 await addBoard(values);
                 message.success("Board added successfully!");
+                await getBoards();
             } else {
                 await updateBoard(data!.id, values);
                 message.success("Board updated successfully!");
+               await getBoards();
             }
             navigate("/module/boards");
         } catch (error) {
@@ -45,6 +49,7 @@ const AddorEditBoardPage: React.FC = () => {
         try {
             await deleteBoard(id);
             message.success("Board deleted successfully!");
+            await getBoards();
             navigate("/module/boards");
         } catch (error) {
             message.error("Failed to delete the board!");

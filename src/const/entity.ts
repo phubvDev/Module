@@ -13,3 +13,22 @@ export interface BoardData {
     membershipSystem: boolean;
     status: number;
 }
+
+export interface PostData {
+    id: number;
+    boardId: number;
+    prefaceText: string;
+    title: string;
+    writerName: string;
+    date: string;
+    detail: string;
+    attachment1: string;
+    attachment2: string;
+    attachment3: string;
+    youtubeURL: string;
+    thumbnail: string;
+    totalView: number;
+    createdAt: string;
+    updatedAt: string;
+    images: string;
+}

@@ -1,22 +1,28 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import styles from './sidebar.module.css'
 import Sider from "antd/es/layout/Sider";
 import {MenuProps, Menu, Row, Col, Image} from 'antd'
 import {FaClipboardList, FaListUl, FaRegCircle} from "react-icons/fa";
-import {Link} from "react-router-dom";
-import {fetchBoards} from "../../services/boardService.ts";
+import {Link, useNavigate} from "react-router-dom";
 import imageAdmin from '../../assets/images/AdminLogo.png'
+import {useGetBoards} from "../../context/GetBoardsContext.tsx";
 
 type MenuItems = Required<MenuProps>['items'][number]
 
 
 const Sidebar: React.FC = () => {
-    const [items, setItems] = useState<MenuItems[]>([
+    const {boards, getBoards} = useGetBoards();
+    const navigate = useNavigate();
+    const items: MenuItems[] = [
         {
             key: '1',
             icon: <FaListUl className={styles.menuItemIcon}/>,
             label: "멀티 게시판 목록",
-            children: [] // Sẽ cập nhật khi có dữ liệu boards
+            children: boards.map((board: any) => ({
+                key: board.boardId,
+                icon: <FaRegCircle/>,
+                label: <Link to={`/module/posts?boardId=${board.boardId}`}>{board.name}</Link>
+            })) as MenuItems[]
         },
         {
             key: '2',
@@ -29,42 +35,17 @@ const Sidebar: React.FC = () => {
                 {key: 'avan4', icon: <FaRegCircle/>, label: <Link to="/">게시판 통계</Link>},
             ]
         }
-    ]);
-    const [boards, setBoards] = useState<any[]>([]);
-
+    ];
 
     useEffect(() => {
-        const getBoards = async () => {
-            const data = await fetchBoards();
-            setBoards(data);
-
-            //tạo mảng children từ boards
-            const boardChildren = data.map((board: any) => ({
-                key: board.boardID,
-                icon: <FaRegCircle/>,
-                label: board.name
-            })) as MenuItems;
-
-            // Cập nhật items với children mới cho mục key '1'
-            setItems((prevItems) =>
-                prevItems.map((item) => {
-                        if (item && item.key === '1') {
-                            return {...item, children: boardChildren};
-                        }
-                        return item;
-                    }
-                ) as MenuItems[]
-            );
-        }
         getBoards();
-    }, []);
+    }, [getBoards]);
 
-    console.log("boards", boards);
 
     return (
         <Sider className={styles.container} width={250}>
             <Row align={"middle"} gutter={16} className={styles.row} style={{marginRight: -12}}
-                 onClick={() => console.log("Click Module")}>
+                 onClick={() => navigate('/module')}>
                 <Col>
                     <Image preview={false} src={imageAdmin} width={33}/>
                 </Col>

@@ -140,12 +140,20 @@ const BoardPage: React.FC = () => {
         <div className={styles.container}>
             <h1>게시판 목록</h1>
             <Card title={titleCard()}>
-                <Table columns={columns} dataSource={data} bordered={true} rowKey="id" rowClassName={styles.row}
-                       onRow={(record) => ({onClick: () => onRowClick(record)})}/>
+                <Table columns={columns}
+                       dataSource={data}
+                       bordered={true}
+                       rowKey="id"
+                       rowClassName={styles.row}
+                       scroll={{x: "max-content"}}
+                       onRow={(record) => ({onClick: () => onRowClick(record)})}
+                />
             </Card>
             <Row style={{justifyContent: 'end', marginTop: 16}}>
-                <Button type={"primary"} style={{height: 40}}
-                        onClick={() => navigate("/module/boards/addboard", {state: {mode: 'create'}})}
+                <Button
+                    type={"primary"}
+                    style={{height: 40}}
+                    onClick={() => navigate("/module/boards/addboard", {state: {mode: 'create'}})}
                 >
                     게시판 추가
                 </Button>

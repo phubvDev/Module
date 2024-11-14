@@ -6,7 +6,17 @@ export const fetchBoards = async (): Promise<any> => {
         const response = await axiosInstance.get('/boards');
         return response.data.data;
     } catch (error) {
-        console.log("Error fetching boards: ", error);
+        console.error("Error fetching boards: ", error);
+        throw error;
+    }
+}
+
+export const fetchBoardByBoardId = async (boardId: string): Promise<any> => {
+    try {
+        const response = await axiosInstance.get(`/boards/byBoardId/${boardId}`)
+        return response.data.data;
+    } catch (error) {
+        console.error("Error getting board: ", error);
         throw error;
     }
 }
