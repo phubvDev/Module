@@ -45,8 +45,7 @@ function FindId() {
                         <Button type="link" onClick={goToFindPassword} style={{ padding: '0 8px' }}>
                             비밀번호 찾기
                         </Button>
-                        |
-                        <Link to="/login" style={{ padding: '0 8px' }}>
+                        <Link to="/module/login" style={{ padding: '0 8px' }}>
                             로그인
                         </Link>
                     </div>
