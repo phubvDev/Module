@@ -13,4 +13,6 @@ public interface IUserService {
         Optional<UserDTO> findByEmail(String email);
         Optional<UserDTO> findByPhone(String phone);
         List<UserDTO> getAllUsers();
+        boolean checkPassword(String rawPassword, String encryptedPassword);
+        Optional<UserDTO> findByUserId(String userId);
 }

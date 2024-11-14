@@ -11,10 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.avansoft.module_java_remake.exception.UserNotFoundException;
 
-
+import java.util.Optional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,6 +89,15 @@ public class UserServiceImpl implements IUserService {
     @Override
     public Optional<UserDTO> findByPhone(String phone) {
         return userRepository.findByPhone(phone)
+                .map(userFactory::createDTOFromUser);
+    }
+    @Override
+    public boolean checkPassword(String rawPassword, String encryptedPassword) {
+        return passwordEncoder.matches(rawPassword, encryptedPassword);
+    }
+    @Override
+    public Optional<UserDTO> findByUserId(String userId) {
+        return userRepository.findByUserId(userId)
                 .map(userFactory::createDTOFromUser);
     }
 }

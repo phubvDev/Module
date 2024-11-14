@@ -60,4 +60,12 @@ public class UserServiceDecorator implements IUserService {
     public List<UserDTO> getAllUsers() {
         return decoratedUserService.getAllUsers();
     }
+    @Override
+    public boolean checkPassword(String rawPassword, String encryptedPassword) {
+        return decoratedUserService.checkPassword(rawPassword, encryptedPassword);
+    }
+    @Override
+    public Optional<UserDTO> findByUserId(String userId) {
+        return decoratedUserService.findByUserId(userId);
+    }
 }
