@@ -1,9 +1,41 @@
 import { Button, Input, Form } from 'antd';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/images/logo.png';
+import axios from 'axios';
 
 function Login() {
+    const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
+
+    const handleLogin = async () => {
+        const userId = (document.getElementById('exampleInputEmail1') as HTMLInputElement)?.value;
+        const password = (document.getElementById('password') as HTMLInputElement)?.value;
+
+        if (!userId || !password) {
+            alert('아이디와 비밀번호를 입력해주세요.');
+            return;
+        }
+
+        try {
+            const response = await axios.post('/api/auth/login', {
+                user_id: userId,
+                password,
+            });
+
+            if (response.status === 200) {
+                alert('로그인 성공!');
+                // Lưu token vào localStorage để sử dụng sau này
+                localStorage.setItem('authToken', response.data);
+                navigate('/module/boards');
+            } else {
+                alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('로그인 중 오류가 발생했습니다.');
+        }
+    };
+
     return (
         <div className="wrapper" style={{ padding: '16px', textAlign: 'center' }}>
             <a href="#" style={{ display: 'block', margin: '40px 0' }}>
@@ -17,7 +49,7 @@ function Login() {
                     <Form.Item label="아이디" style={{ marginBottom: '16px' }}>
                         <Input className="ant-input ant-input-lg" id="exampleInputEmail1" placeholder="아이디를 입력해주세요" />
                     </Form.Item>
-                    <Form.Item label="비밀번호" style={{ marginBottom: '16px'}}>
+                    <Form.Item label="비밀번호" style={{ marginBottom: '16px' }}>
                         <Input.Password
                             style={{ height: 40 }}
                             id="password"
@@ -26,7 +58,12 @@ function Login() {
                             iconRender={(visible) => (visible ? <EyeOutlined /> : <EyeInvisibleOutlined />)}
                         />
                     </Form.Item>
-                    <Button type="primary" size="large" style={{ width: '100%' }}>
+                    <Button
+                        type="primary"
+                        size="large"
+                        style={{ width: '100%' }}
+                        onClick={handleLogin}
+                    >
                         로그인
                     </Button>
                     <div className="text-center" style={{ marginTop: '8px' }}>
