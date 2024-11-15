@@ -1,14 +1,22 @@
 import { useState } from 'react';
-import { Form, Input, Button, Checkbox, Collapse, Typography, Modal } from 'antd';
+import { Form, Input, Button, Checkbox, Collapse, Typography, Modal, message } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import DaumPostcode from 'react-daum-postcode';
 import { Link } from 'react-router-dom';
 import Logo from '../../assets/images/logo.png';
 import styles from './register.module.css';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+
+interface UserData {
+    username: string;
+    password: string;
+    email: string;
+    [key: string]: string;
+}
 
 const Register: React.FC = () => {
     const [allChecked, setAllChecked] = useState(false);
@@ -25,6 +33,9 @@ const Register: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
     const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+    const [verificationCode, setVerificationCode] = useState('');
+    const [isVerified, setIsVerified] = useState(false);
+    const [form] = Form.useForm();
 
     const togglePasswordVisibility = () => setShowPassword(!showPassword);
     const toggleRePasswordVisibility = () => setShowRePassword(!showRePassword);
@@ -59,6 +70,84 @@ const Register: React.FC = () => {
         setIsPostcodeOpen(false);
     };
 
+    // Gửi mã xác minh đến email
+    const sendVerificationCode = async () => {
+        const email = form.getFieldValue('email');
+        if (!email) {
+            message.warning('Vui lòng nhập email trước khi gửi mã xác minh');
+            return;
+        }
+
+        try {
+            await axios.post('http://localhost:8080/api/auth/send-verification-code', { email });
+            message.success('Mã xác minh đã được gửi đến email của bạn');
+        } catch {
+            message.error('Không thể gửi mã xác minh. Vui lòng thử lại sau');
+        }
+    };
+
+    // Xác thực mã xác minh
+    const verifyCode = async () => {
+        try {
+            const response = await axios.post('http://localhost:8080/api/auth/verify-code', {
+                email: form.getFieldValue('email'),
+                code: verificationCode
+            });
+
+            if (response.data.success) {
+                message.success('Xác minh thành công');
+                setIsVerified(true);
+            } else {
+                message.error('Mã xác minh không đúng');
+            }
+        } catch {
+            message.error('Lỗi xác minh. Vui lòng thử lại');
+        }
+    };
+
+    // Kiểm tra các checkbox điều khoản bắt buộc đã được chọn chưa
+    const hasRequiredAgreements = () => {
+        const { terms, privacy, delegation, thirdParty } = checkedItems;
+        return terms && privacy && delegation && thirdParty;
+    };
+
+    // Kiểm tra xem người dùng đã tồn tại trong CSDL chưa
+    const checkUserExists = async (username: string, email: string) => {
+        try {
+            const response = await axios.post('http://localhost:8080/api/auth/check-user-exists', { username, email });
+            return response.data.exists;
+        } catch {
+            message.error("Lỗi khi kiểm tra người dùng. Vui lòng thử lại.");
+            return false;
+        }
+    };
+
+    // Gửi yêu cầu đăng ký
+    const handleRegister = async (values: UserData) => {
+        if (!isVerified) {
+            message.warning('Vui lòng xác minh mã trước khi đăng ký');
+            return;
+        }
+
+        if (!hasRequiredAgreements()) {
+            message.warning('Vui lòng đồng ý với các điều khoản bắt buộc');
+            return;
+        }
+
+        const userExists = await checkUserExists(values.username, values.email);
+        if (userExists) {
+            message.warning('Người dùng đã tồn tại. Vui lòng sử dụng tên đăng nhập hoặc email khác');
+            return;
+        }
+
+        try {
+            await axios.post('http://localhost:8080/api/auth/register', values);
+            message.success("Đăng ký thành công!");
+        } catch {
+            message.error("Đăng ký thất bại, vui lòng thử lại.");
+        }
+    };
+
     return (
         <div className={styles.wrapper}>
             <a href="/" className={styles.logoLink}>
@@ -70,15 +159,15 @@ const Register: React.FC = () => {
             </Text>
 
             <div className={styles.formContainer}>
-                <Form layout="vertical" style={{ textAlign: 'left' }}>
-                    <Form.Item label={<> 아이디</>} required style={{ marginBottom: '16px' }}>
+                <Form form={form} layout="vertical" style={{ textAlign: 'left' }} onFinish={handleRegister}>
+                    <Form.Item name="username" label={<> 아이디</>} required style={{ marginBottom: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Input placeholder="영문숫자 3자이상 입력해 주세요." style={{ flex: 1, marginRight: '16px' }} />
                             <Button type="primary" style={{ whiteSpace: 'nowrap' }}>중복확인</Button>
                         </div>
                     </Form.Item>
 
-                    <Form.Item label={<> 비밀번호</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item name="password" label={<> 비밀번호</>} required style={{ marginBottom: '16px' }}>
                         <Input.Password
                             placeholder="영문,숫자,특수문자 포함 8자 이상 입력해 주세요"
                             iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
@@ -88,7 +177,7 @@ const Register: React.FC = () => {
                         />
                     </Form.Item>
 
-                    <Form.Item label={<> 비밀번호 재입력</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item name="repassword" label={<> 비밀번호 재입력</>} required style={{ marginBottom: '16px' }}>
                         <Input.Password
                             placeholder="비밀번호를 재입력해 주세요"
                             iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
@@ -98,25 +187,30 @@ const Register: React.FC = () => {
                         />
                     </Form.Item>
 
-                    <Form.Item label={<> 이름</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item name="name" label={<> 이름</>} required style={{ marginBottom: '16px' }}>
                         <Input placeholder="이름을 입력해 주세요." />
                     </Form.Item>
 
-                    <Form.Item label="휴대폰 번호" style={{ marginBottom: '16px' }}>
+                    <Form.Item name="phone" label="휴대폰 번호" style={{ marginBottom: '16px' }}>
                         <Input placeholder="‘-‘자를 제외하고 입력해 주세요." />
                     </Form.Item>
 
-                    <Form.Item label={<> 이메일 주소</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item name="email" label={<> 이메일 주소</>} required style={{ marginBottom: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             <Input type="email" placeholder="이메일 형식으로 입력해주세요." style={{ flex: 1, marginRight: '16px' }} />
-                            <Button type="primary" style={{ whiteSpace: 'nowrap' }}>인증메일 발송</Button>
+                            <Button type="primary" onClick={sendVerificationCode} style={{ whiteSpace: 'nowrap' }}>인증메일 발송</Button>
                         </div>
-                        <div style={{display: 'flex', alignItems: 'center', marginTop: '16px', marginBottom: '16px'}}>
-                            <Input type="email" placeholder="인증코드 6자리를 입력해주세요.."
-                                   style={{flex: 1, marginRight: '16px'}}/>
-                            <Button type="primary" style={{whiteSpace: 'nowrap'}}>인증코드 입력</Button>
+                        <div style={{ display: 'flex', alignItems: 'center', marginTop: '16px', marginBottom: '16px' }}>
+                            <Input
+                                type="text"
+                                placeholder="인증코드 6자리를 입력해주세요.."
+                                style={{ flex: 1, marginRight: '16px' }}
+                                value={verificationCode}
+                                onChange={(e) => setVerificationCode(e.target.value)}
+                            />
+                            <Button type="primary" onClick={verifyCode} style={{ whiteSpace: 'nowrap' }}>인증코드 입력</Button>
                         </div>
-                        <Text type="secondary" >비밀번호 및 아이디 찾기, 기타 정보발송에 이메일 주소가 사용됩니다.</Text>
+                        <Text type="secondary">비밀번호 및 아이디 찾기, 기타 정보발송에 이메일 주소가 사용됩니다.</Text>
                     </Form.Item>
 
                     <Form.Item label="주소" style={{ marginBottom: '16px' }}>
@@ -139,7 +233,7 @@ const Register: React.FC = () => {
                         </Modal>
                     )}
 
-                    <Form.Item label="추천인 ID" style={{ marginBottom: '16px' }}>
+                    <Form.Item name="referrer" label="추천인 ID" style={{ marginBottom: '16px' }}>
                         <Input placeholder="추천인 ID는 나중에 변경 할 수 없습니다." />
                     </Form.Item>
 
@@ -176,7 +270,7 @@ const Register: React.FC = () => {
                         </Panel>
                     </Collapse>
 
-                    <Button type="primary" block style={{ marginTop: '20px' }}>동의하고 회원가입</Button>
+                    <Button type="primary" block style={{ marginTop: '20px' }} htmlType="submit">동의하고 회원가입</Button>
                     <div style={{ marginTop: '10px', textAlign: 'center' }}>
                         <Link to="/module/findid" style={{ marginRight: '10px' }}>아이디 찾기</Link> |
                         <Link to="/module/login" style={{ marginLeft: '10px' }}>로그인</Link>

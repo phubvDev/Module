@@ -17,8 +17,8 @@ function Login() {
         }
 
         try {
-            const response = await axios.post('/api/auth/login', {
-                user_id: userId,
+            const response = await axios.post('http://localhost:8080/api/avansoft/module/auth/login', {
+                userId: userId,
                 password,
             });
 
