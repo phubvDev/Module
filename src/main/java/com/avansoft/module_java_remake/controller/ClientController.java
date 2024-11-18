@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("${API_BASE_URL}/client")
 public class ClientController {
     @Autowired
     private IClientService clientService;
