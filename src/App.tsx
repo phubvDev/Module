@@ -4,7 +4,9 @@ import {GetBoardsProvider} from "./context/GetBoardsContext.tsx";
 
 function App() {
     return <GetBoardsProvider>
-        <RouterProvider router={router}/>
+        <RouterProvider future={{
+            v7_startTransition: true,
+        }} router={router}/>
     </GetBoardsProvider>;
 }
 
