@@ -5,10 +5,16 @@ import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Thực thể lưu trữ mã xác minh email.
+ *
+ * @since 8
+ */
 @Entity
 @Table(name = "email_verify_codes")
 @Data
 public class EmailVerifyCode {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
