@@ -79,7 +79,7 @@ const Register: React.FC = () => {
         }
 
         try {
-            await axios.post('http://localhost:8080/api/auth/send-verification-code', { email });
+            await axios.post('http://localhost:8080/api/avansoft/module/email/create', { email });
             message.success('Mã xác minh đã được gửi đến email của bạn');
         } catch {
             message.error('Không thể gửi mã xác minh. Vui lòng thử lại sau');
@@ -194,31 +194,38 @@ const Register: React.FC = () => {
                     <Form.Item name="phone" label="휴대폰 번호" style={{ marginBottom: '16px' }}>
                         <Input placeholder="‘-‘자를 제외하고 입력해 주세요." />
                     </Form.Item>
-
-                    <Form.Item name="email" label={<> 이메일 주소</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item name="email" label={<> 이메일 주소</>} style={{marginBottom: "0px"}}>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Input type="email" placeholder="이메일 형식으로 입력해주세요." style={{ flex: 1, marginRight: '16px' }} />
+                            <Input name="email" type="email" placeholder="이메일 형식으로 입력해주세요." style={{ flex: 1, marginRight: '16px' }} />
                             <Button type="primary" onClick={sendVerificationCode} style={{ whiteSpace: 'nowrap' }}>인증메일 발송</Button>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', marginTop: '16px', marginBottom: '16px' }}>
-                            <Input
-                                type="text"
-                                placeholder="인증코드 6자리를 입력해주세요.."
-                                style={{ flex: 1, marginRight: '16px' }}
-                                value={verificationCode}
-                                onChange={(e) => setVerificationCode(e.target.value)}
-                            />
-                            <Button type="primary" onClick={verifyCode} style={{ whiteSpace: 'nowrap' }}>인증코드 입력</Button>
-                        </div>
-                        <Text type="secondary">비밀번호 및 아이디 찾기, 기타 정보발송에 이메일 주소가 사용됩니다.</Text>
                     </Form.Item>
-
-                    <Form.Item label="주소" style={{ marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                            <Input placeholder="우편번호를 입력해 주세요." style={{ flex: 1, marginRight: '16px' }} id="zipcode" readOnly />
+                        <Form.Item name="verify" required style={{marginBottom: '16px'}}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                marginTop: '16px',
+                                marginBottom: '16px'
+                            }}>
+                                <Input
+                                    type="text"
+                                    placeholder="인증코드 6자리를 입력해주세요.."
+                                    style={{flex: 1, marginRight: '16px'}}
+                                    value={verificationCode}
+                                    onChange={(e) => setVerificationCode(e.target.value)}
+                                />
+                                <Button type="primary" onClick={verifyCode} style={{whiteSpace: 'nowrap'}}>인증코드
+                                    입력</Button>
+                            </div>
+                            <Text type="secondary">비밀번호 및 아이디 찾기, 기타 정보발송에 이메일 주소가 사용됩니다.</Text>
+                        </Form.Item>
+                    <Form.Item label="주소" style={{marginBottom: '16px'}}>
+                        <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
+                            <Input placeholder="우편번호를 입력해 주세요." style={{flex: 1, marginRight: '16px'}} id="zipcode"
+                                   readOnly/>
                             <Button type="primary" onClick={() => setIsPostcodeOpen(true)}>주소찾기</Button>
                         </div>
-                        <Input placeholder="주소를 입력해 주세요." style={{ marginBottom: '10px' }} id="address" readOnly />
+                        <Input placeholder="주소를 입력해 주세요." style={{marginBottom: '10px'}} id="address" readOnly/>
                         <Input placeholder="상세주소를 입력해 주세요." />
                     </Form.Item>
 
