@@ -1,7 +1,7 @@
 package com.avansoft.module_java_remake.service;
 
 import com.avansoft.module_java_remake.dto.DataMailDTO;
-import com.avansoft.module_java_remake.dto.sdi.ClientSdi;
+import com.avansoft.module_java_remake.dto.sdi.EmailSdi;
 import com.avansoft.module_java_remake.utils.Const;
 import com.avansoft.module_java_remake.utils.DataUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class ClientServiceImpl implements IClientService {
+public class EmailServiceImpl implements IEmailService {
     @Autowired
     private IMailService mailService;
 
     @Override
-    public Boolean create(ClientSdi sdi) {
+    public Boolean create(EmailSdi sdi) {
         try {
             DataMailDTO dataMail = new DataMailDTO();
 
