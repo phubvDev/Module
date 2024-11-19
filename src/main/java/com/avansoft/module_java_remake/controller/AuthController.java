@@ -16,10 +16,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("${API_BASE_URL}/auth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
     private final IUserService userService;
-
-    public AuthController(@Qualifier("emailConfirmationUserService") IUserService userService) {
+    public AuthController(@Qualifier("userServiceImpl") IUserService userService) {
         this.userService = userService;
     }
 
@@ -32,17 +32,17 @@ public class AuthController {
             String token = Jwts.builder()
                     .setSubject(user.get().getUserId())
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 864_000_000)) // 10 ngày
+                    .setExpiration(new Date(System.currentTimeMillis() + 864_000_000))
                     .signWith(SignatureAlgorithm.HS256, "secretKey")
                     .compact();
 
-            // Đưa token vào một đối tượng JSON để trả về
+
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
 
             return ResponseEntity.ok(response);
         } else {
-            // Trả về lỗi xác thực nếu thông tin đăng nhập không hợp lệ
+
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);

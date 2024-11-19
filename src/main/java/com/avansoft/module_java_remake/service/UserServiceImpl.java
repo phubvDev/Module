@@ -6,6 +6,7 @@ import com.avansoft.module_java_remake.factory.UserFactory;
 import com.avansoft.module_java_remake.repository.IUserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Primary
 public class UserServiceImpl implements IUserService {
 
     @Autowired
