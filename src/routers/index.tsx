@@ -12,6 +12,7 @@ const RegisterPage = React.lazy(() => import('../pages/register'));
 const AddorEditBoardPage = React.lazy(() => import('../pages/add_edit_Board'));
 const PostPage = React.lazy(() => import('../pages/post'))
 const AddOrEditPostPage = React.lazy(() => import('../pages/add_edit_Post'))
+const PostDetailPage = React.lazy(() => import('../pages/postdetail'))
 
 const router = createBrowserRouter([
     {
@@ -95,15 +96,38 @@ const router = createBrowserRouter([
                 </Layout>
             </React.Suspense>
         )
-    }
-], {
-    future: {
-       v7_relativeSplatPath: true,
-        v7_fetcherPersist: true,
-        v7_normalizeFormMethod: true,
-        v7_partialHydration: true,
-        v7_skipActionErrorRevalidation: true,
     },
-});
+    {
+        path: 'module/posts/:id',
+        element: (
+            <React.Suspense fallback={<Loading />}>
+                <Layout>
+                    <PostDetailPage/>
+                </Layout>
+            </React.Suspense>
+        )
+    },
+    {
+        path:'module/posts/edit',
+        element: (
+            <React.Suspense fallback={<Loading />}>
+                <Layout>
+                    <AddOrEditPostPage />
+                </Layout>
+            </React.Suspense>
+        )
+    },
+
+],
+{
+    future: {
+        v7_relativeSplatPath: true,
+            v7_fetcherPersist: true,
+            v7_normalizeFormMethod: true,
+            v7_partialHydration: true,
+            v7_skipActionErrorRevalidation: true,
+    },
+}
+);
 
 export default router;

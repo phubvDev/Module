@@ -176,7 +176,6 @@ const AddorEditBoardPage: React.FC = () => {
                             </Button>
                         </Col>
                     </Row>
-
                 </Row>
             </Card>
         </div>
