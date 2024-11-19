@@ -154,7 +154,12 @@ public class PostService implements IPostService {
             post.setTotalView(postDTO.getTotalView());
             post.setCreatedAt(postDTO.getCreatedAt());
             post.setUpdatedAt(postDTO.getUpdatedAt());
-            post.setImages(postDTO.getImages());
+
+            if (postDTO.getImagesFile() != null && !postDTO.getImagesFile().isEmpty()) {
+                String path = fileStorageService.saveFile(postDTO.getImagesFile(), "images");
+                post.setImages(path);
+            }
+
 
             post = postRepository.save(post);
 
@@ -188,12 +193,32 @@ public class PostService implements IPostService {
             post.setWriterName(postDTO.getWriterName());
             post.setDate(postDTO.getDate());
             post.setDetail(postDTO.getDetail());
-            post.setAttachment1(postDTO.getAttachment1());
-            post.setAttachment2(postDTO.getAttachment2());
-            post.setAttachment3(postDTO.getAttachment3());
+            // Xử lý file tải lên
+            if (postDTO.getAttachment1File() != null && !postDTO.getAttachment1File().isEmpty()) {
+                String path = fileStorageService.saveFile(postDTO.getAttachment1File(), "attachment");
+                post.setAttachment1(path); // Lưu đường dẫn file
+            }
+            if (postDTO.getAttachment2File() != null && !postDTO.getAttachment2File().isEmpty()) {
+                String path = fileStorageService.saveFile(postDTO.getAttachment2File(), "attachment");
+                post.setAttachment2(path);
+            }
+            if (postDTO.getAttachment3File() != null && !postDTO.getAttachment3File().isEmpty()) {
+                String path = fileStorageService.saveFile(postDTO.getAttachment3File(), "attachment");
+                post.setAttachment3(path);
+            }
             post.setYoutubeURL(postDTO.getYoutubeURL());
-            post.setThumbnail(postDTO.getThumbnail());
-            post.setImages(postDTO.getImages());
+
+
+            if (postDTO.getThumbnailFile() != null && !postDTO.getThumbnailFile().isEmpty()) {
+                String path = fileStorageService.saveFile(postDTO.getThumbnailFile(), "thumbnail");
+                post.setThumbnail(path);
+            }
+
+            if (postDTO.getImagesFile() != null && !postDTO.getImagesFile().isEmpty()) {
+                String path = fileStorageService.saveFile(postDTO.getImagesFile(), "images");
+                post.setImages(path);
+            }
+
 
             post = postRepository.save(post);
             return ResponseEntity.status(HttpStatus.OK)

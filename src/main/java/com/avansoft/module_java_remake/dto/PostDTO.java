@@ -60,5 +60,7 @@ public class PostDTO {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private MultipartFile imagesFile;
     private String images;
 }

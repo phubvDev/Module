@@ -56,19 +56,17 @@ public class PostController {
         } else {
             System.out.println("Khong co error");
         }
-
-
-
         return postService.addPost(postDTO);
     }
 
     @PutMapping("/editpost/{id}")
-    public ResponseEntity<CoreResponse<?>> editPost(@PathVariable Long id, @Valid @RequestBody PostDTO postDTO, BindingResult bindingResult) {
+    public ResponseEntity<CoreResponse<?>> editPost(@PathVariable Long id, @Valid @ModelAttribute PostDTO postDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors()
                     .stream()
                     .map(error -> error.getDefaultMessage())
                     .collect(Collectors.joining(","));
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(CoreResponse.builder()
                             .code(HttpStatus.BAD_REQUEST.value())
