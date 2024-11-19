@@ -103,6 +103,40 @@ public class BoardService implements IBoardService {
         }
     }
 
+    @Override
+    public CoreResponse<?> getBoardByBoardId(String boardId) {
+        try {
+            Board board = boardRepository.findByBoardId(boardId);
+            BoardDTO boardDTO = BoardDTO.builder()
+                    .id(board.getId())
+                    .boardId(board.getBoardId())
+                    .type(board.getType())
+                    .name(board.getName())
+                    .createdAt(board.getCreatedAt())
+                    .updatedAt(board.getUpdatedAt())
+                    .preface(board.getPreface())
+                    .prefaceText(board.getPrefaceText())
+                    .managerId(board.getManager().getId())
+                    .read(board.getRead())
+                    .write(board.getWrite())
+                    .membershipSystem(board.getMembershipSystem())
+                    .status(board.getStatus())
+                    .build();
+            return CoreResponse.builder()
+                    .code(HttpStatus.OK.value())
+                    .message("Board found successfully")
+                    .data(boardDTO)
+                    .build();
+
+        } catch (Exception e) {
+            return CoreResponse.builder()
+                    .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message(e.getMessage())
+                    .data(null)
+                    .build();
+        }
+    }
+
     @Transactional
     @Override
     public CoreResponse<?> addBoard(BoardDTO boardDTO) {
@@ -139,7 +173,7 @@ public class BoardService implements IBoardService {
                     .message("Board created successfully")
                     .data(board)
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             return CoreResponse.builder()
                     .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                     .message("Failed to create board: " + e.getMessage())

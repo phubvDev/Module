@@ -1,8 +1,9 @@
 package com.avansoft.module_java_remake.dto;
 
-import jakarta.validation.constraints.*;
+
 import lombok.*;
 
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 @Builder
@@ -24,7 +25,6 @@ public class BoardDTO {
     @NotBlank(message = "Name can't be blank")
     @Size(max = 255, message = "Name must be less than 255 characters")
     private String name;
-
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
