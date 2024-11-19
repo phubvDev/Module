@@ -6,7 +6,7 @@ import {Button, Card, Col, Divider, Row, Table, Typography} from 'antd'
 import styles from './post.module.css'
 import {successColor, thirstColor} from "../../const/colors.ts";
 import {FaCog} from 'react-icons/fa'
-import {fetchPostsByBoardId} from "../../services/postService.tsx";
+import {fetchPostsByBoardId} from "../../services/postService.ts";
 import PostGridComponent from "../../components/postgrid";
 import PostCardComponent from "../../components/postcard";
 import type {ColumnsType} from "antd/es/table";
@@ -95,7 +95,7 @@ const PostPage: React.FC = () => {
         },
     ]
     const onRowClick = (record: PostData) => {
-        navigate("/module/posts/" + record.id);
+        navigate("/module/posts/" + record.id , {state: {data: record}});
     }
     const titleCard = () => {
         return (
@@ -166,7 +166,7 @@ const PostPage: React.FC = () => {
                     <Button
                         type={"primary"}
                         style={{backgroundColor: successColor}}
-                        onClick={() => navigate(`/module/posts/create?boardId=${boardId}`)}
+                        onClick={() => navigate(`/module/posts/create?boardId=${boardId}`,{state:{mode: "create"}})}
                     >
                         글쓰기
                     </Button>
@@ -187,26 +187,14 @@ const PostPage: React.FC = () => {
                         />
                     ) : boardData?.type === 2 ? (
                         <Row gutter={[16,16]}>
-                            {postData.map((post) =>
-                                <PostGridComponent key={post.id}
-                                                   title={post.title}
-                                                   totalLike={0}
-                                                   date={post.date}
-                                                   writerName={post.writerName}
-                                                   totalView={post.totalView}
-                                />
+                            {postData.map((post,index) =>
+                                <PostGridComponent  key={index} postData={post}/>
                             )}
                         </Row>
 
                     ) : (
-                        postData.map((post) =>
-                        <PostCardComponent key={post.id}
-                                           title={post.title}
-                                           totalLike={0}
-                                           date={post.date}
-                                           writerName={post.writerName}
-                                           totalView={post.totalView}
-                        />
+                        postData.map((post,index) =>
+                        <PostCardComponent key={index} postData={post}/>
                         )
                     )
                 }

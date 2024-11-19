@@ -7,6 +7,7 @@ const BoardPage = React.lazy(() => import('../pages/board'));
 const AddorEditBoardPage = React.lazy(() => import('../pages/add_edit_Board'));
 const PostPage = React.lazy(() => import('../pages/post'))
 const AddOrEditPostPage = React.lazy(() => import('../pages/add_edit_Post'))
+const PostDetailPage = React.lazy(() => import('../pages/postdetail'))
 
 const router = createBrowserRouter([
     {
@@ -58,7 +59,27 @@ const router = createBrowserRouter([
                 </Layout>
             </React.Suspense>
         )
-    }
+    },
+    {
+        path: 'module/posts/:id',
+        element: (
+            <React.Suspense fallback={<Loading />}>
+                <Layout>
+                    <PostDetailPage/>
+                </Layout>
+            </React.Suspense>
+        )
+    },
+    {
+        path:'module/posts/edit',
+        element: (
+            <React.Suspense fallback={<Loading />}>
+                <Layout>
+                    <AddOrEditPostPage />
+                </Layout>
+            </React.Suspense>
+        )
+    },
 ]);
 
 export default router;
