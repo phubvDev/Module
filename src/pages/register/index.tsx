@@ -175,8 +175,8 @@ const Register: React.FC = () => {
                 message.warning('Người dùng đã tồn tại. Vui lòng sử dụng tên đăng nhập hoặc email khác.');
                 return;
             }
-            console.log('value',values);
-            await axios.post('http://localhost:8080/api/auth/register', values);
+
+            await axios.post('http://localhost:8080/api/avansoft/module/users/register', values);
             message.success('Đăng ký thành công!');
             form.resetFields();
             setIsVerified(false);
