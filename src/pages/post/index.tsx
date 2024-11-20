@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {BoardData, PostData} from "../../const/entity.ts";
 import {fetchBoardByBoardId} from "../../services/boardService.ts";
-import {Button, Card, Col, Divider, Row, Table, Typography} from 'antd'
+import {Button, Card, Col, Divider, Pagination, Row, Table, Typography} from 'antd'
 import styles from './post.module.css'
 import {successColor, thirstColor} from "../../const/colors.ts";
 import {FaCog} from 'react-icons/fa'
@@ -16,6 +16,10 @@ const PostPage: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const boardId = searchParams.get("boardId");
+    const [currentPage,setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(0);
+    const [totalItems, setTotalItems] = useState<number>(0);
+    const [pageSize] = useState<number>(10);
     const [boardData, setBoardData] = useState<BoardData>();
     const [postData, setPostData] = useState<PostData[]>([]);
 
@@ -29,10 +33,13 @@ const PostPage: React.FC = () => {
         }
     }
 
-    const getPostByBoardId = async (boardId: number) => {
+    const getPostByBoardId = async (boardId: number,page:number) => {
         try {
-            const data = await fetchPostsByBoardId(boardId)
-            setPostData(data);
+            const data = await fetchPostsByBoardId(boardId,page-1,pageSize);
+            console.log("post data:",data);
+            setPostData(data.data);
+            setTotalPages(data.totalPages);
+            setTotalItems(data.totalItems);
         } catch (error) {
             console.error("Error getPostByBoardId", error);
             return null;
@@ -47,16 +54,17 @@ const PostPage: React.FC = () => {
 
     useEffect(() => {
         if (boardData?.id !== undefined) {
-            getPostByBoardId(boardData.id);
+            getPostByBoardId(boardData.id,currentPage);
             console.log("BoardID", boardData.id);
 
         }
-    }, [boardData]);
+    }, [boardData,currentPage]);
     const prefaceText = boardData?.prefaceText?.split(",");
     const handleClickPrefaceText = (prefaceText: string) => {
         console.log("Click Preface Text", prefaceText);
     }
     console.log("Post data", postData);
+    console.log("totalItems", totalItems);
     const columns: ColumnsType<PostData> = [
         {
             title: 'NO',
@@ -199,6 +207,15 @@ const PostPage: React.FC = () => {
                     )
                 }
             </Card>
+            {totalItems > 10 && (
+                <Pagination
+                    current={currentPage}
+                    total={totalItems}
+                    pageSize={pageSize}
+                    onChange={(page) => setCurrentPage(page)}
+                    style={{ marginTop: 16,textAlign: "center" }}
+                />
+            )}
         </div>
     )
 }

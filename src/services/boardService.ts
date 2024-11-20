@@ -1,6 +1,7 @@
 import axiosInstance from "./index.ts";
 import {BoardData} from "../const/entity.ts";
 
+
 export const fetchBoards = async (): Promise<any> => {
     try {
         const response = await axiosInstance.get('/boards');
@@ -32,7 +33,7 @@ export const fetchBoardById = async (Id: number): Promise<any> => {
 }
 export const addBoard = async (boardData: BoardData): Promise<any> => {
     try {
-        const response = await axiosInstance.post('/boards/addboard', boardData)
+        const response = await axiosInstance.post('/boards/addboard',boardData)
         console.log("data added",response.data.data);
         return response.data.data;
     } catch (error) {

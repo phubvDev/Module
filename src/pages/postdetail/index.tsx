@@ -6,6 +6,7 @@ import { FaRegThumbsUp,FaRegThumbsDown } from "react-icons/fa";
 import {grayColor, primaryColor, secondaryColor} from "../../const/colors.ts";
 import { fetchBoardById} from "../../services/boardService.ts";
 import {BoardData} from "../../const/entity.ts";
+import {downloadFile} from "../../utils";
 
 const {Title, Text} = Typography;
 
@@ -71,9 +72,36 @@ const PostDetailPage: React.FC = () => {
             <Divider/>
             <Row align={"middle"} style={{width:'100%'}} gutter={8}>
                 <Col><Text style={{ fontSize:16}}>첨부파일 :</Text></Col>
-                <Col><Text style={{fontSize:16,fontWeight:"bold",color:primaryColor}}> {data.attachment1 ? "첨부파일 #1" : null}</Text></Col>
-                <Col><Text style={{fontSize:16,fontWeight:"bold",color:primaryColor}}> {data.attachment2 ? "첨부파일 #2" : null}</Text></Col>
-                <Col><Text style={{fontSize:16,fontWeight:"bold",color:primaryColor}}> {data.attachment3 ? "첨부파일 #3" : null}</Text></Col>
+                {data.attachment1 && (
+                    <Col>
+                        <Text
+                            style={{fontSize: 16, fontWeight: "bold", color: primaryColor, cursor: "pointer"}}
+                            onClick={() => downloadFile(data.attachment1)}
+                        >
+                            첨부파일 #1
+                        </Text>
+                    </Col>
+                )}
+                {data.attachment2 && (
+                    <Col>
+                        <Text
+                            style={{fontSize: 16, fontWeight: "bold", color: primaryColor, cursor: "pointer"}}
+                            onClick={() => downloadFile(data.attachment2)}
+                        >
+                            첨부파일 #2
+                        </Text>
+                    </Col>
+                )}
+                {data.attachment3 && (
+                    <Col>
+                        <Text
+                            style={{fontSize: 16, fontWeight: "bold", color: primaryColor, cursor: "pointer"}}
+                            onClick={() => downloadFile(data.attachment3)}
+                        >
+                            첨부파일 #3
+                        </Text>
+                    </Col>
+                )}
             </Row>
 
             <Divider/>
