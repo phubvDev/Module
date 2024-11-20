@@ -61,7 +61,6 @@ const Register: React.FC = () => {
             return newCheckedItems;
         });
     };
-
     // Gửi mã xác minh
     const sendVerificationCode = async () => {
         const email = form.getFieldValue('email');
@@ -129,27 +128,32 @@ const Register: React.FC = () => {
         return terms && privacy && delegation && thirdParty;
     };
 
-    // Kiểm tra người dùng đã tồn tại
-    const checkUserExists = async (username: string, email: string): Promise<boolean> => {
+    const handleUserIdChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const userId = e.target.value;
+        const userExists = await checkUserIdExists(userId);
+        console.log('user', userId);
+        if (userExists) {
+            message.warning('UserId đã tồn tại. Vui lòng chọn một UserId khác.');
+        } else {
+            message.success('UserId hợp lệ.');
+        }
+    };
+
+    const checkUserIdExists = async (userId: string) => {
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/check-user-exists', {username, email});
-            return response.data.exists;
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                // Lỗi từ Axios
-                const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi không xác định từ máy chủ.';
-                message.error(errorMessage);
-            } else {
-                // Lỗi không phải từ Axios
-                message.error('Lỗi hệ thống khi kiểm tra người dùng. Vui lòng thử lại.');
-            }
+            const response = await axios.post('http://localhost:8080/api/avansoft/module/users/check-username', { userId });
+            return response.data.exists; // Kiểm tra nếu userId đã tồn tại
+        } catch {
+            message.error('Lỗi khi kiểm tra userId. Vui lòng thử lại.');
             return false;
         }
     };
 
+
+
     // Xử lý khi form được submit
     interface RegisterFormValues {
-        username: string;
+        userId: string;
         password: string;
         email: string;
         phone?: string;
@@ -170,16 +174,21 @@ const Register: React.FC = () => {
         }
 
         try {
-            const userExists = await checkUserExists(values.username, values.email);
+            // Kiểm tra xem userId có tồn tại không
+            const userExists = await checkUserIdExists(values.userId);
             if (userExists) {
-                message.warning('Người dùng đã tồn tại. Vui lòng sử dụng tên đăng nhập hoặc email khác.');
+                message.warning('UserId đã tồn tại. Vui lòng chọn một UserId khác.');
                 return;
             }
 
+            // Gửi dữ liệu đăng ký lên backend
             await axios.post('http://localhost:8080/api/avansoft/module/users/register', values);
             message.success('Đăng ký thành công!');
+
+            // Reset các trường trong form
             form.resetFields();
             setIsVerified(false);
+
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi không xác định từ máy chủ.';
@@ -189,6 +198,7 @@ const Register: React.FC = () => {
             }
         }
     };
+
 
     return (
         <div className={styles.wrapper}>
@@ -202,12 +212,17 @@ const Register: React.FC = () => {
 
             <div className={styles.formContainer}>
                 <Form form={form} layout="vertical" style={{textAlign: 'left'}} onFinish={handleRegister}>
-                    <Form.Item name="username" label="아이디" required style={{marginBottom: '16px'}}>
+                    <Form.Item name="userId" label="아이디" required style={{marginBottom: '16px'}}>
                         <div style={{display: 'flex', alignItems: 'center'}}>
-                            <Input placeholder="영문숫자 3자이상 입력해 주세요." style={{flex: 1, marginRight: '16px'}}/>
+                            <Input
+                                placeholder="영문숫자 3자이상 입력해 주세요."
+                                style={{flex: 1, marginRight: '16px'}}
+                                onBlur={handleUserIdChange}  // Gọi hàm kiểm tra khi mất focus
+                            />
                             <Button type="primary" style={{whiteSpace: 'nowrap'}}>중복확인</Button>
                         </div>
                     </Form.Item>
+
 
                     <Form.Item name="password" label="비밀번호" required style={{marginBottom: '16px'}}>
                         <Input.Password
