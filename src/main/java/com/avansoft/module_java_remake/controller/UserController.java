@@ -22,7 +22,7 @@ public class UserController {
     }
     @PostMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
+        String username = request.get("userId");
         boolean exists = userService.checkUserExists(username);
 
         if (exists) {
