@@ -12,5 +12,7 @@ public class CoreResponse<T> {
     private int code;
     private String message;
     public T data;
-
+    private Long totalItems;
+    private int totalPages;
+    private int currentPage;
 }
