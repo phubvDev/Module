@@ -32,11 +32,31 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public UserDTO createUser(UserDTO userDTO) {
+    public UserDTO registerUser(UserDTO userDTO) {
+        // Kiểm tra email đã tồn tại
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email đã tồn tại.");
+        }
+
+        // Kiểm tra userId đã tồn tại
+        if (userRepository.findByUserId(userDTO.getUserId()).isPresent()) {
+            throw new IllegalArgumentException("User ID đã tồn tại.");
+        }
+
+        // Tạo entity từ DTO
         User user = userFactory.createUserFromDTO(userDTO);
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+
+        // Lưu entity vào DB
         User savedUser = userRepository.save(user);
+
+        // Trả về DTO sau khi lưu
         return userFactory.createDTOFromUser(savedUser);
+    }
+    @Override
+    public boolean checkUserExists(String userId) {
+        // Kiểm tra xem userId có tồn tại trong cơ sở dữ liệu không
+        return userRepository.findByUserId(userId).isPresent(); // Trả về true nếu có người dùng, false nếu không có
     }
 
     @Override

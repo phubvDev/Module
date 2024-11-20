@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -18,13 +20,29 @@ public class UserController {
     public UserController(IUserService userService) {
         this.userService = userService;
     }
+    @PostMapping("/check-username")
+    public ResponseEntity<?> checkUsername(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        boolean exists = userService.checkUserExists(username);
 
-    @PostMapping()
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-        UserDTO createdUser = userService.createUser(userDTO);
-        return ResponseEntity.ok(createdUser);
+        if (exists) {
+            return ResponseEntity.ok(Collections.singletonMap("exists", true));  // User exists
+        } else {
+            return ResponseEntity.ok(Collections.singletonMap("exists", false));  // User does not exist
+        }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
+        try {
+            UserDTO registerUser = userService.registerUser(userDTO);
+            return ResponseEntity.ok(registerUser);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(500).body("Đã xảy ra lỗi. Vui lòng thử lại sau.");
+        }
+    }
     @GetMapping()
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();

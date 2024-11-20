@@ -1,6 +1,7 @@
 package com.avansoft.module_java_remake.service;
 
 import com.avansoft.module_java_remake.dto.UserDTO;
+import com.avansoft.module_java_remake.entity.User;
 import com.avansoft.module_java_remake.factory.UserFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,8 +23,8 @@ public class UserServiceDecorator implements IUserService {
     }
 
     @Override
-    public UserDTO createUser(UserDTO userDTO) {
-        return decoratedUserService.createUser(userDTO);
+    public UserDTO registerUser(UserDTO userDTO) {
+        return decoratedUserService.registerUser(userDTO);
     }
 
     @Override
@@ -65,7 +66,13 @@ public class UserServiceDecorator implements IUserService {
         return decoratedUserService.checkPassword(rawPassword, encryptedPassword);
     }
     @Override
+
+    public boolean checkUserExists(String userId) {
+        return decoratedUserService.checkUserExists(userId);
+    }
+    @Override
     public Optional<UserDTO> findByUserId(String userId) {
         return decoratedUserService.findByUserId(userId);
     }
+
 }
