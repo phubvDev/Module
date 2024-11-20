@@ -11,16 +11,20 @@ import axios from 'axios';
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
-interface UserData {
-    username: string;
-    password: string;
-    email: string;
-    [key: string]: string;
+interface CheckedItems {
+    terms: boolean;
+    privacy: boolean;
+    delegation: boolean;
+    thirdParty: boolean;
+    marketing: boolean;
+    emailConsent: boolean;
+    smsConsent: boolean;
+    appPushConsent: boolean;
 }
 
 const Register: React.FC = () => {
-    const [allChecked, setAllChecked] = useState(false);
-    const [checkedItems, setCheckedItems] = useState({
+    const [allChecked, setAllChecked] = useState<boolean>(false);
+    const [checkedItems, setCheckedItems] = useState<CheckedItems>({
         terms: false,
         privacy: false,
         delegation: false,
@@ -28,49 +32,37 @@ const Register: React.FC = () => {
         marketing: false,
         emailConsent: false,
         smsConsent: false,
-        appPushConsent: false
+        appPushConsent: false,
     });
-    const [showPassword, setShowPassword] = useState(false);
-    const [showRePassword, setShowRePassword] = useState(false);
-    const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
-    const [verificationCode, setVerificationCode] = useState('');
-    const [isVerified, setIsVerified] = useState(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [isPostcodeOpen, setIsPostcodeOpen] = useState<boolean>(false);
+    const [verificationCode, setVerificationCode] = useState<string>('');
+    const [isVerified, setIsVerified] = useState<boolean>(false);
+    const [showRePassword, setShowRePassword] = useState<boolean>(false);
     const [form] = Form.useForm();
 
-    const togglePasswordVisibility = () => setShowPassword(!showPassword);
-    const toggleRePasswordVisibility = () => setShowRePassword(!showRePassword);
-
+    // Xử lý checkbox đồng ý tất cả
     const handleAllCheckChange = (e: CheckboxChangeEvent) => {
         const checked = e.target.checked;
         setAllChecked(checked);
-        setCheckedItems({
-            terms: checked,
-            privacy: checked,
-            delegation: checked,
-            thirdParty: checked,
-            marketing: checked,
-            emailConsent: checked,
-            smsConsent: checked,
-            appPushConsent: checked
+        setCheckedItems((prev) =>
+            Object.keys(prev).reduce(
+                (acc, key) => ({...acc, [key]: checked}),
+                {} as CheckedItems
+            )
+        );
+    };
+
+    // Xử lý checkbox riêng lẻ
+    const handleIndividualCheckChange = (key: keyof CheckedItems, checked: boolean) => {
+        setCheckedItems((prev) => {
+            const newCheckedItems = {...prev, [key]: checked};
+            setAllChecked(Object.values(newCheckedItems).every(Boolean));
+            return newCheckedItems;
         });
     };
 
-    const handleIndividualCheckChange = (key: string, checked: boolean) => {
-        setCheckedItems(prev => ({ ...prev, [key]: checked }));
-        setAllChecked(Object.values({ ...checkedItems, [key]: checked }).every(Boolean));
-    };
-
-    const handleComplete = (data: { address: string; zonecode: string }) => {
-        const addressInput = document.getElementById('address') as HTMLInputElement | null;
-        const zipcodeInput = document.getElementById('zipcode') as HTMLInputElement | null;
-
-        if (addressInput) addressInput.value = data.address;
-        if (zipcodeInput) zipcodeInput.value = data.zonecode;
-
-        setIsPostcodeOpen(false);
-    };
-
-    // Gửi mã xác minh đến email
+    // Gửi mã xác minh
     const sendVerificationCode = async () => {
         const email = form.getFieldValue('email');
         if (!email) {
@@ -79,79 +71,129 @@ const Register: React.FC = () => {
         }
 
         try {
-            await axios.post('http://localhost:8080/api/avansoft/module/email/create', { email });
+            await axios.post('http://localhost:8080/api/avansoft/module/email/create', {email});
             message.success('Mã xác minh đã được gửi đến email của bạn');
-        } catch {
-            message.error('Không thể gửi mã xác minh. Vui lòng thử lại sau');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                // Lỗi từ Axios (phản hồi từ server)
+                const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi không xác định.';
+                message.error(errorMessage);
+            } else {
+                // Lỗi không phải của Axios
+                message.error('Không thể gửi mã xác minh. Vui lòng thử lại sau');
+            }
         }
     };
 
-    // Xác thực mã xác minh
+    // Xác minh mã xác thực
     const verifyCode = async () => {
+        const email = form.getFieldValue('email');
+        if (!email || !verificationCode) {
+            message.warning('Vui lòng nhập email và mã xác minh.');
+            return;
+        }
+
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/verify-code', {
-                email: form.getFieldValue('email'),
-                code: verificationCode
+            const response = await axios.post('http://localhost:8080/api/avansoft/module/verify-code', {
+                email,
+                code: verificationCode,
             });
 
             if (response.data.success) {
-                message.success('Xác minh thành công');
+                message.success('Mã xác minh hợp lệ.');
                 setIsVerified(true);
             } else {
-                message.error('Mã xác minh không đúng');
+                const errorMessage =
+                    response.data.message.includes('not found')
+                        ? 'Mã xác minh không tồn tại.'
+                        : response.data.message.includes('expired')
+                            ? 'Mã xác minh đã hết hạn.'
+                            : 'Lỗi không xác định. Vui lòng thử lại.';
+                message.error(errorMessage);
+                setVerificationCode('');
             }
-        } catch {
-            message.error('Lỗi xác minh. Vui lòng thử lại');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi không xác định từ máy chủ.';
+                message.error(errorMessage);
+            } else {
+                message.error('Lỗi hệ thống khi xác minh mã. Vui lòng thử lại sau.');
+            }
+            setVerificationCode('');
         }
     };
 
-    // Kiểm tra các checkbox điều khoản bắt buộc đã được chọn chưa
+    // Kiểm tra xem đã đồng ý các điều khoản cần thiết chưa
     const hasRequiredAgreements = () => {
-        const { terms, privacy, delegation, thirdParty } = checkedItems;
+        const {terms, privacy, delegation, thirdParty} = checkedItems;
         return terms && privacy && delegation && thirdParty;
     };
 
-    // Kiểm tra xem người dùng đã tồn tại trong CSDL chưa
-    const checkUserExists = async (username: string, email: string) => {
+    // Kiểm tra người dùng đã tồn tại
+    const checkUserExists = async (username: string, email: string): Promise<boolean> => {
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/check-user-exists', { username, email });
+            const response = await axios.post('http://localhost:8080/api/auth/check-user-exists', {username, email});
             return response.data.exists;
-        } catch {
-            message.error("Lỗi khi kiểm tra người dùng. Vui lòng thử lại.");
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                // Lỗi từ Axios
+                const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi không xác định từ máy chủ.';
+                message.error(errorMessage);
+            } else {
+                // Lỗi không phải từ Axios
+                message.error('Lỗi hệ thống khi kiểm tra người dùng. Vui lòng thử lại.');
+            }
             return false;
         }
     };
 
-    // Gửi yêu cầu đăng ký
-    const handleRegister = async (values: UserData) => {
+    // Xử lý khi form được submit
+    interface RegisterFormValues {
+        username: string;
+        password: string;
+        email: string;
+        phone?: string;
+        address?: string;
+
+        [key: string]: unknown; // Để xử lý các trường bổ sung không xác định
+    }
+
+    const handleRegister = async (values: RegisterFormValues) => {
         if (!isVerified) {
-            message.warning('Vui lòng xác minh mã trước khi đăng ký');
+            message.warning('Vui lòng xác minh mã trước khi đăng ký.');
             return;
         }
 
         if (!hasRequiredAgreements()) {
-            message.warning('Vui lòng đồng ý với các điều khoản bắt buộc');
-            return;
-        }
-
-        const userExists = await checkUserExists(values.username, values.email);
-        if (userExists) {
-            message.warning('Người dùng đã tồn tại. Vui lòng sử dụng tên đăng nhập hoặc email khác');
+            message.warning('Vui lòng đồng ý với các điều khoản bắt buộc.');
             return;
         }
 
         try {
+            const userExists = await checkUserExists(values.username, values.email);
+            if (userExists) {
+                message.warning('Người dùng đã tồn tại. Vui lòng sử dụng tên đăng nhập hoặc email khác.');
+                return;
+            }
+            console.log('value',values);
             await axios.post('http://localhost:8080/api/auth/register', values);
-            message.success("Đăng ký thành công!");
-        } catch {
-            message.error("Đăng ký thất bại, vui lòng thử lại.");
+            message.success('Đăng ký thành công!');
+            form.resetFields();
+            setIsVerified(false);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || 'Đã xảy ra lỗi không xác định từ máy chủ.';
+                message.error(errorMessage);
+            } else {
+                message.error('Đăng ký thất bại, vui lòng thử lại.');
+            }
         }
     };
 
     return (
         <div className={styles.wrapper}>
             <a href="/" className={styles.logoLink}>
-                <img src={Logo} alt="Logo" style={{ maxWidth: '250px' }} />
+                <img src={Logo} alt="Logo" style={{maxWidth: '250px'}}/>
             </a>
             <Title level={1}>회원가입</Title>
             <Text type="secondary" className={styles.subtitle}>
@@ -159,74 +201,126 @@ const Register: React.FC = () => {
             </Text>
 
             <div className={styles.formContainer}>
-                <Form form={form} layout="vertical" style={{ textAlign: 'left' }} onFinish={handleRegister}>
-                    <Form.Item name="username" label={<> 아이디</>} required style={{ marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Input placeholder="영문숫자 3자이상 입력해 주세요." style={{ flex: 1, marginRight: '16px' }} />
-                            <Button type="primary" style={{ whiteSpace: 'nowrap' }}>중복확인</Button>
+                <Form form={form} layout="vertical" style={{textAlign: 'left'}} onFinish={handleRegister}>
+                    <Form.Item name="username" label="아이디" required style={{marginBottom: '16px'}}>
+                        <div style={{display: 'flex', alignItems: 'center'}}>
+                            <Input placeholder="영문숫자 3자이상 입력해 주세요." style={{flex: 1, marginRight: '16px'}}/>
+                            <Button type="primary" style={{whiteSpace: 'nowrap'}}>중복확인</Button>
                         </div>
                     </Form.Item>
 
-                    <Form.Item name="password" label={<> 비밀번호</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item name="password" label="비밀번호" required style={{marginBottom: '16px'}}>
                         <Input.Password
                             placeholder="영문,숫자,특수문자 포함 8자 이상 입력해 주세요"
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                            visibilityToggle={false}
-                            suffix={<Button onClick={togglePasswordVisibility} type="link">{showPassword ? <EyeInvisibleOutlined /> : <EyeTwoTone />}</Button>}
                             type={showPassword ? 'text' : 'password'}
+                            iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                            suffix={
+                                <Button
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    type="link"
+                                    style={{padding: 0}}
+                                >
+                                    {showPassword ? <EyeInvisibleOutlined/> : <EyeTwoTone/>}
+                                </Button>
+                            }
                         />
                     </Form.Item>
 
-                    <Form.Item name="repassword" label={<> 비밀번호 재입력</>} required style={{ marginBottom: '16px' }}>
+                    <Form.Item
+                        name="repassword"
+                        label="비밀번호 재입력"
+                        rules={[
+                            {required: true, message: '비밀번호를 재입력해 주세요!'},
+                            ({getFieldValue}) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error('비밀번호가 일치하지 않습니다.'));
+                                },
+                            }),
+                        ]}
+                        style={{marginBottom: '16px'}}
+                    >
                         <Input.Password
                             placeholder="비밀번호를 재입력해 주세요"
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                            visibilityToggle={false}
-                            suffix={<Button onClick={toggleRePasswordVisibility} type="link">{showRePassword ? <EyeInvisibleOutlined /> : <EyeTwoTone />}</Button>}
                             type={showRePassword ? 'text' : 'password'}
+                            iconRender={(visible) =>
+                                visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>
+                            }
+                            suffix={
+                                <Button
+                                    onClick={() => setShowRePassword(!showRePassword)}
+                                    type="link"
+                                    style={{padding: 0}}
+                                >
+                                    {showRePassword ? <EyeInvisibleOutlined/> : <EyeTwoTone/>}
+                                </Button>
+                            }
                         />
                     </Form.Item>
 
-                    <Form.Item name="name" label={<> 이름</>} required style={{ marginBottom: '16px' }}>
-                        <Input placeholder="이름을 입력해 주세요." />
+                    <Form.Item name="name" label="이름" required style={{marginBottom: '16px'}}>
+                        <Input placeholder="이름을 입력해 주세요."/>
                     </Form.Item>
 
-                    <Form.Item name="phone" label="휴대폰 번호" style={{ marginBottom: '16px' }}>
-                        <Input placeholder="‘-‘자를 제외하고 입력해 주세요." />
+                    <Form.Item name="phone" label="휴대폰 번호" style={{marginBottom: '16px'}}>
+                        <Input placeholder="‘-‘자를 제외하고 입력해 주세요."/>
                     </Form.Item>
-                    <Form.Item name="email" label={<> 이메일 주소</>} style={{marginBottom: "0px"}}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Input name="email" type="email" placeholder="이메일 형식으로 입력해주세요." style={{ flex: 1, marginRight: '16px' }} />
-                            <Button type="primary" onClick={sendVerificationCode} style={{ whiteSpace: 'nowrap' }}>인증메일 발송</Button>
+
+                    <Form.Item name="email" label="이메일 주소" style={{marginBottom: '16px'}}>
+                        <div style={{display: 'flex', alignItems: 'center'}}>
+                            <Input name="email" type="email" placeholder="이메일 형식으로 입력해주세요."
+                                   style={{flex: 1, marginRight: '16px'}}/>
+                            <Button type="primary" onClick={sendVerificationCode} style={{whiteSpace: 'nowrap'}}>인증메일
+                                발송</Button>
                         </div>
                     </Form.Item>
-                        <Form.Item name="verify" required style={{marginBottom: '16px'}}>
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                marginTop: '16px',
-                                marginBottom: '16px'
-                            }}>
-                                <Input
-                                    type="text"
-                                    placeholder="인증코드 6자리를 입력해주세요.."
-                                    style={{flex: 1, marginRight: '16px'}}
-                                    value={verificationCode}
-                                    onChange={(e) => setVerificationCode(e.target.value)}
-                                />
-                                <Button type="primary" onClick={verifyCode} style={{whiteSpace: 'nowrap'}}>인증코드
-                                    입력</Button>
-                            </div>
-                            <Text type="secondary">비밀번호 및 아이디 찾기, 기타 정보발송에 이메일 주소가 사용됩니다.</Text>
-                        </Form.Item>
-                    <Form.Item label="주소" style={{marginBottom: '16px'}}>
-                        <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
-                            <Input placeholder="우편번호를 입력해 주세요." style={{flex: 1, marginRight: '16px'}} id="zipcode"
-                                   readOnly/>
+
+                    <Form.Item name="verify" required style={{marginBottom: '16px'}}>
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginTop: '16px',
+                            marginBottom: '16px'
+                        }}>
+                            <Input
+                                type="text"
+                                placeholder="인증코드 6자리를 입력해주세요."
+                                style={{flex: 1, marginRight: '16px'}}
+                                value={verificationCode}
+                                onChange={(e) => setVerificationCode(e.target.value)}
+                            />
+                            <Button type="primary" onClick={verifyCode} style={{whiteSpace: 'nowrap'}}>인증코드 입력</Button>
+                        </div>
+                        <Text type="secondary">비밀번호 및 아이디 찾기, 기타 정보발송에 이메일 주소가 사용됩니다.</Text>
+                    </Form.Item>
+
+                    <Form.Item label="주소" style={{ marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                            <Form.Item
+                                name="zipcode"
+                                style={{ flex: 1, marginRight: '16px', marginBottom: 0 }}
+                                rules={[{ required: true, message: '우편번호를 입력해 주세요.' }]}
+                            >
+                                <Input placeholder="우편번호를 입력해 주세요." readOnly />
+                            </Form.Item>
                             <Button type="primary" onClick={() => setIsPostcodeOpen(true)}>주소찾기</Button>
                         </div>
-                        <Input placeholder="주소를 입력해 주세요." style={{marginBottom: '10px'}} id="address" readOnly/>
-                        <Input placeholder="상세주소를 입력해 주세요." />
+                        <Form.Item
+                            name="address"
+                            style={{ marginBottom: '10px' }}
+                            rules={[{ required: true, message: '주소를 입력해 주세요.' }]}
+                        >
+                            <Input placeholder="주소를 입력해 주세요." readOnly />
+                        </Form.Item>
+                        <Form.Item
+                            name="detail_address"
+                            style={{ marginBottom: '10px' }}
+                            rules={[{ required: true, message: '상세주소를 입력해 주세요.' }]}
+                        >
+                            <Input placeholder="상세주소를 입력해 주세요." />
+                        </Form.Item>
                     </Form.Item>
 
                     {isPostcodeOpen && (
@@ -236,51 +330,77 @@ const Register: React.FC = () => {
                             footer={null}
                             style={{ top: 20 }}
                         >
-                            <DaumPostcode onComplete={handleComplete} />
+                            <DaumPostcode
+                                onComplete={(data) => {
+                                    // Cập nhật giá trị của zipcode và address
+                                    form.setFieldsValue({
+                                        zipcode: data.zonecode, // Gán mã bưu điện
+                                        address: data.address, // Gán địa chỉ
+                                    });
+                                    setIsPostcodeOpen(false); // Đóng modal
+                                }}
+                            />
                         </Modal>
                     )}
 
-                    <Form.Item name="referrer" label="추천인 ID" style={{ marginBottom: '16px' }}>
-                        <Input placeholder="추천인 ID는 나중에 변경 할 수 없습니다." />
+
+                    <Form.Item name="referrer" label="추천인 ID" style={{marginBottom: '16px'}}>
+                        <Input placeholder="추천인 ID는 나중에 변경 할 수 없습니다."/>
                     </Form.Item>
 
-                    <Form.Item style={{ marginBottom: '16px' }}>
+                    <Form.Item style={{marginBottom: '16px'}}>
                         <Checkbox checked={allChecked} onChange={handleAllCheckChange}>
                             <b>모두 동의</b> <Text type="secondary">(필수 및 선택 항목 동의 포함)</Text>
                         </Checkbox>
                     </Form.Item>
 
                     <Collapse>
-                        <Panel header={<Checkbox checked={checkedItems.terms} onChange={(e) => handleIndividualCheckChange('terms', e.target.checked)}>이용약관 동의 (필수)</Checkbox>} key="1">
+                        <Panel header={<Checkbox checked={checkedItems.terms}
+                                                 onChange={(e) => handleIndividualCheckChange('terms', e.target.checked)}>이용약관
+                            동의 (필수)</Checkbox>} key="1">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.privacy} onChange={(e) => handleIndividualCheckChange('privacy', e.target.checked)}>개인정보수집·이용 동의(필수)</Checkbox>} key="2">
+                        <Panel header={<Checkbox checked={checkedItems.privacy}
+                                                 onChange={(e) => handleIndividualCheckChange('privacy', e.target.checked)}>개인정보수집·이용
+                            동의(필수)</Checkbox>} key="2">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.delegation} onChange={(e) => handleIndividualCheckChange('delegation', e.target.checked)}>개인정보처리·위탁 동의(필수)</Checkbox>} key="3">
+                        <Panel header={<Checkbox checked={checkedItems.delegation}
+                                                 onChange={(e) => handleIndividualCheckChange('delegation', e.target.checked)}>개인정보처리·위탁
+                            동의(필수)</Checkbox>} key="3">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.thirdParty} onChange={(e) => handleIndividualCheckChange('thirdParty', e.target.checked)}>개인정보 제3자 제공 동의(필수)</Checkbox>} key="4">
+                        <Panel header={<Checkbox checked={checkedItems.thirdParty}
+                                                 onChange={(e) => handleIndividualCheckChange('thirdParty', e.target.checked)}>개인정보
+                            제3자 제공 동의(필수)</Checkbox>} key="4">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.marketing} onChange={(e) => handleIndividualCheckChange('marketing', e.target.checked)}>마케팅 활용 동의 (선택)</Checkbox>} key="5">
+                        <Panel header={<Checkbox checked={checkedItems.marketing}
+                                                 onChange={(e) => handleIndividualCheckChange('marketing', e.target.checked)}>마케팅
+                            활용 동의 (선택)</Checkbox>} key="5">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.emailConsent} onChange={(e) => handleIndividualCheckChange('emailConsent', e.target.checked)}>이메일 수신 동의(선택)</Checkbox>} key="6">
+                        <Panel header={<Checkbox checked={checkedItems.emailConsent}
+                                                 onChange={(e) => handleIndividualCheckChange('emailConsent', e.target.checked)}>이메일
+                            수신 동의(선택)</Checkbox>} key="6">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.smsConsent} onChange={(e) => handleIndividualCheckChange('smsConsent', e.target.checked)}>SMS수신 동의(선택)</Checkbox>} key="7">
+                        <Panel header={<Checkbox checked={checkedItems.smsConsent}
+                                                 onChange={(e) => handleIndividualCheckChange('smsConsent', e.target.checked)}>SMS수신
+                            동의(선택)</Checkbox>} key="7">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
-                        <Panel header={<Checkbox checked={checkedItems.appPushConsent} onChange={(e) => handleIndividualCheckChange('appPushConsent', e.target.checked)}>앱 푸시 수신 동의(선택)</Checkbox>} key="8">
+                        <Panel header={<Checkbox checked={checkedItems.appPushConsent}
+                                                 onChange={(e) => handleIndividualCheckChange('appPushConsent', e.target.checked)}>앱
+                            푸시 수신 동의(선택)</Checkbox>} key="8">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         </Panel>
                     </Collapse>
 
-                    <Button type="primary" block style={{ marginTop: '20px' }} htmlType="submit">동의하고 회원가입</Button>
-                    <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                        <Link to="/module/findid" style={{ marginRight: '10px' }}>아이디 찾기</Link> |
-                        <Link to="/module/login" style={{ marginLeft: '10px' }}>로그인</Link>
+                    <Button type="primary" block style={{marginTop: '20px'}} htmlType="submit">동의하고 회원가입</Button>
+                    <div style={{marginTop: '10px', textAlign: 'center'}}>
+                        <Link to="/module/findid" style={{marginRight: '10px'}}>아이디 찾기</Link> |
+                        <Link to="/module/login" style={{marginLeft: '10px'}}>로그인</Link>
                     </div>
                 </Form>
             </div>
@@ -290,6 +410,5 @@ const Register: React.FC = () => {
             </div>
         </div>
     );
-};
-
-export default Register;
+}
+export default Register
