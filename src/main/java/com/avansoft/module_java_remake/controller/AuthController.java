@@ -2,6 +2,7 @@ package com.avansoft.module_java_remake.controller;
 
 import com.avansoft.module_java_remake.dto.UserDTO;
 import com.avansoft.module_java_remake.service.IUserService;
+import com.avansoft.module_java_remake.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +30,7 @@ public class AuthController {
 
         if (user.isPresent() && userService.checkPassword(userDTO.getPassword(), user.get().getPassword())) {
 
-            String token = Jwts.builder()
-                    .setSubject(user.get().getUserId())
-                    .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis() + 864_000_000))
-                    .signWith(SignatureAlgorithm.HS256, "secretKey")
-                    .compact();
-
-
+            String token = JwtTokenUtil.generateToken(user.get().getUserId());
             Map<String, String> response = new HashMap<>();
             response.put("token", token);
 

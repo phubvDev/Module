@@ -1,6 +1,8 @@
 package com.avansoft.module_java_remake.dto;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -32,15 +34,25 @@ public class PostDTO {
     private String writerName;
 
     @NotNull(message = "date can't be null")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     @NotBlank(message = "detail can't be blank")
     private String detail;
 
+    // Trường để nhận file tải lên
+    private MultipartFile attachment1File;
+    private MultipartFile attachment2File;
+    private MultipartFile attachment3File;
+
+    // Trường để lưu đường dẫn file
     private String attachment1;
     private String attachment2;
     private String attachment3;
+
     private String youtubeURL;
+
+    private MultipartFile thumbnailFile;
     private String thumbnail;
 
     @NotNull(message = "totalView can't be null")
@@ -48,5 +60,7 @@ public class PostDTO {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private MultipartFile imagesFile;
     private String images;
 }
