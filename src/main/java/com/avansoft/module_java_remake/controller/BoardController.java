@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${API_BASE_URL}/boards")
-@CrossOrigin(origins = "http://localhost:5173/")
+
 public class BoardController {
     private final IBoardService boardService;
 
