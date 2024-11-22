@@ -21,6 +21,15 @@ export const fetchBoardByBoardId = async (boardId: string): Promise<any> => {
     }
 }
 
+export const fetchBoardById = async (Id: number): Promise<any> => {
+    try {
+        const response = await axiosInstance.get(`/boards/byId/${Id}`)
+        return response.data.data;
+    } catch (error) {
+        console.error("Error getting board: ", error);
+        throw error;
+    }
+}
 export const addBoard = async (boardData: BoardData): Promise<any> => {
     try {
         const response = await axiosInstance.post('/boards/addboard', boardData)
