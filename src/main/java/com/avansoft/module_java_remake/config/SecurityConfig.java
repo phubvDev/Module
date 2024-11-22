@@ -20,6 +20,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors().and()
                 .csrf().disable()
+                .cors().and()
                 .authorizeRequests()
                 .antMatchers("/auth/login","/api/avansoft/module/auth/login").permitAll()
                 .anyRequest().authenticated()

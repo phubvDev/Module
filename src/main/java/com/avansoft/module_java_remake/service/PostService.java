@@ -7,6 +7,9 @@ import com.avansoft.module_java_remake.repository.IBoardRepository;
 import com.avansoft.module_java_remake.repository.IPostRepository;
 import com.avansoft.module_java_remake.response.CoreResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,9 +77,56 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public ResponseEntity<CoreResponse<?>> getPostByBoardId(Long boardId) {
+    public ResponseEntity<CoreResponse<?>> getPostByPage(int pageNo, int pageSize) {
         try {
-            List<Post> posts = postRepository.findByBoardId(boardId, Sort.by(Sort.Direction.DESC, "id"));
+            Pageable pageable = PageRequest.of(pageNo,pageSize,Sort.by(Sort.Direction.DESC,"id"));
+            Page<Post>  pagedPosts = postRepository.findAll(pageable);
+
+            List<PostDTO> postDTOS = pagedPosts.getContent().stream()
+                    .map(post -> PostDTO.builder()
+                            .id(post.getId())
+                            .boardId(post.getBoard().getId())
+                            .prefaceText(post.getPrefaceText())
+                            .title(post.getTitle())
+                            .writerName(post.getWriterName())
+                            .date(post.getDate())
+                            .detail(post.getDetail())
+                            .attachment1(post.getAttachment1())
+                            .attachment2(post.getAttachment2())
+                            .attachment3(post.getAttachment3())
+                            .youtubeURL(post.getYoutubeURL())
+                            .thumbnail(post.getThumbnail())
+                            .totalView(post.getTotalView())
+                            .createdAt(post.getCreatedAt())
+                            .updatedAt(post.getUpdatedAt())
+                            .images(post.getImages())
+                            .build())
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(CoreResponse.builder()
+                            .code(HttpStatus.OK.value())
+                            .message("Fetched posts successfully")
+                            .data(postDTOS)
+                            .totalItems(pagedPosts.getTotalElements())
+                            .totalPages(pagedPosts.getTotalPages())
+                            .currentPage(pageNo)
+                            .build());
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CoreResponse.builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Failed to fetch posts: " + e.getMessage())
+                            .data(null)
+                            .build());
+        }
+    }
+
+    @Override
+    public ResponseEntity<CoreResponse<?>> getPostByBoardId(Long boardId, int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"id"));
+            Page<Post> posts = postRepository.findByBoardId(boardId,pageable);
 
             List<PostDTO> postDTOS = posts.stream()
                     .map(post -> PostDTO.builder()
@@ -105,6 +155,9 @@ public class PostService implements IPostService {
                             .code(HttpStatus.OK.value())
                             .message(message)
                             .data(postDTOS)
+                            .totalItems(posts.getTotalElements())
+                            .totalPages(posts.getTotalPages())
+                            .currentPage(page)
                             .build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

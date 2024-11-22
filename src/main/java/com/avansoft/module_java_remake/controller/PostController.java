@@ -24,14 +24,20 @@ public class PostController {
     public PostController(IPostService postService) {
         this.postService = postService;
     }
-    @GetMapping()
+
+    @GetMapping
+    public ResponseEntity<CoreResponse<?>> getPostByPage(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return postService.getPostByPage(page,size);
+    }
+
+    @GetMapping("/allposts")
     public ResponseEntity<CoreResponse<?>> getAllPosts() {
         return postService.getAllPosts();
     }
 
     @GetMapping("/byBoardId/{boardId}")
-    public ResponseEntity<CoreResponse<?>> getPostByBoardId(@PathVariable Long boardId) {
-        return postService.getPostByBoardId(boardId);
+    public ResponseEntity<CoreResponse<?>> getPostByBoardId(@PathVariable Long boardId,@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size ) {
+        return postService.getPostByBoardId(boardId,page,size);
     }
 
     @PostMapping("/addpost")
