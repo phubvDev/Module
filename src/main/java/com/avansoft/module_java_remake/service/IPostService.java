@@ -7,7 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IPostService {
     ResponseEntity<CoreResponse<?>> getAllPosts();
-    ResponseEntity<CoreResponse<?>> getPostByBoardId(Long boardId);
+    ResponseEntity<CoreResponse<?>> getPostByPage(int pageNo, int pageSize);
+    ResponseEntity<CoreResponse<?>> getPostByBoardId(Long boardId, int page, int size);
     ResponseEntity<CoreResponse<?>> addPost(PostDTO postDTO);
     ResponseEntity<CoreResponse<?>> updatePost(Long id,PostDTO postDTO);
     ResponseEntity<CoreResponse<?>> deletePost(Long id);
