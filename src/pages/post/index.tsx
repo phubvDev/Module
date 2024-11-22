@@ -10,6 +10,7 @@ import {fetchPostsByBoardId} from "../../services/postService.ts";
 import PostGridComponent from "../../components/postgrid";
 import PostCardComponent from "../../components/postcard";
 import type {ColumnsType} from "antd/es/table";
+import {fetchLikeByPostId} from "../../services/likeService.ts";
 
 const {Title, Text} = Typography;
 const PostPage: React.FC = () => {
@@ -17,11 +18,11 @@ const PostPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const boardId = searchParams.get("boardId");
     const [currentPage,setCurrentPage] = useState<number>(1);
-    const [totalPages, setTotalPages] = useState<number>(0);
     const [totalItems, setTotalItems] = useState<number>(0);
     const [pageSize] = useState<number>(10);
     const [boardData, setBoardData] = useState<BoardData>();
     const [postData, setPostData] = useState<PostData[]>([]);
+    const [totalLikes, setTotalLikes] = useState<Record<number, number>>({});
 
     const getBoardByBoardId = async (boardId: string) => {
         try {
@@ -38,7 +39,6 @@ const PostPage: React.FC = () => {
             const data = await fetchPostsByBoardId(boardId,page-1,pageSize);
             console.log("post data:",data);
             setPostData(data.data);
-            setTotalPages(data.totalPages);
             setTotalItems(data.totalItems);
         } catch (error) {
             console.error("Error getPostByBoardId", error);
@@ -65,6 +65,26 @@ const PostPage: React.FC = () => {
     }
     console.log("Post data", postData);
     console.log("totalItems", totalItems);
+
+    useEffect(() => {
+        const fetchLikesData = async () => {
+            const newLikeDataMap: Record<number, number> = {};
+            for (const post of postData) {
+                try {
+                    const [totalLike, totalDislike] = await fetchLikeByPostId(post.id);
+                    newLikeDataMap[post.id] = totalLike - totalDislike;
+                } catch (error) {
+                    console.error(`Error fetching like data for post ${post.id}:`, error);
+                    newLikeDataMap[post.id] = 0;
+                }
+            }
+            setTotalLikes(newLikeDataMap);
+        };
+
+        if (postData.length > 0) {
+            fetchLikesData();
+        }
+    }, [postData]);
     const columns: ColumnsType<PostData> = [
         {
             title: 'NO',
@@ -99,7 +119,7 @@ const PostPage: React.FC = () => {
             title: '추천',
             dataIndex: 'totalLike',
             key: 'totalLike',
-            render: () => 0
+            render: (_, record) => totalLikes[record.id] ?? 0,
         },
     ]
     const onRowClick = (record: PostData) => {

@@ -1,17 +1,30 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Card, Col, Row,Typography} from "antd";
 import styles from "./postcard.module.css";
 import { useNavigate} from "react-router-dom";
 import {FaRegThumbsUp} from "react-icons/fa";
 import {grayColor} from "../../const/colors.ts";
 import {PostData} from "../../const/entity.ts";
+import {fetchLikeByPostId} from "../../services/likeService.ts";
 const {Text} = Typography;
 
 interface PostCardProps {
     postData : PostData;
 }
 const PostCardComponent:React.FC<PostCardProps> = ({postData}) => {
-    console.log("postdata");
+    const [likeCount, setLikeCount] = useState<number>(0);
+    useEffect(() => {
+        const fetchLikes = async () => {
+            try {
+                const [totalLike, totalDisLike] = await fetchLikeByPostId(postData.id);
+                setLikeCount(totalLike - totalDisLike);
+            } catch (error) {
+                console.error("Error fetching likes:", error);
+            }
+        };
+
+        fetchLikes();
+    }, [postData.id]);
     const navigate = useNavigate();
     return (
         <Card className={styles.card}>
@@ -20,7 +33,7 @@ const PostCardComponent:React.FC<PostCardProps> = ({postData}) => {
                     <Text onClick={() => navigate(`/module/posts/${postData.id}`,{state: {data: postData}})} style={{fontSize: 18, fontWeight: "bold", color: "#292929",cursor:"pointer"}}>{postData?.title}</Text>
                 </Col>
                 <Col>
-                    <Button icon={<FaRegThumbsUp/>}>0</Button>
+                    <Button icon={<FaRegThumbsUp/>}>{likeCount}</Button>
                 </Col>
             </Row>
             <Row align={"middle"} justify={"space-between"} style={{marginTop: 16}}>

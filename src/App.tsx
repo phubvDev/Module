@@ -1,6 +1,6 @@
 import {RouterProvider} from 'react-router-dom'
 import router from "./routers";
-import {GetBoardsProvider} from "./context/GetBoardsContext.tsx";
+import {GetBoardsProvider} from "./context/GlobalContext.tsx";
 
 function App() {
     return <GetBoardsProvider>

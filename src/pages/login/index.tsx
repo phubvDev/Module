@@ -3,9 +3,11 @@ import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/images/logo.png';
 import {loginService} from "../../services/loginService.ts";
+import {useContextGlobal} from "../../context/GlobalContext.tsx";
 
 function Login() {
     const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
+    const {setUserId} = useContextGlobal();
 
     const handleLogin = async () => {
         const userId = (document.getElementById('exampleInputEmail1') as HTMLInputElement)?.value;
@@ -24,6 +26,8 @@ function Login() {
                 // Lưu token vào localStorage để sử dụng sau này
                 console.log('token',response.data.token)
                 localStorage.setItem('authToken', response.data.token);
+                localStorage.setItem('userId',userId);
+                setUserId(userId);
                 navigate('/module/boards');
             } else {
                 alert('아이디 또는 비밀번호가 올바르지 않습니다.');

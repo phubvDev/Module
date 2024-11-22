@@ -5,10 +5,13 @@ import {Button, Card, Col, Input, Row, Table} from "antd";
 import type {ColumnsType} from 'antd/es/table';
 import {BoardData} from "../../const/entity.ts";
 import {fetchBoards} from "../../services/boardService.ts";
+import {useContextGlobal} from "../../context/GlobalContext.tsx";
 
 const BoardPage: React.FC = () => {
     const [data, setData] = useState<BoardData[]>([]);
     const navigate = useNavigate();
+    const {userId} = useContextGlobal();
+    console.log("userId", userId);
 
     const titleCard = () => {
         return (

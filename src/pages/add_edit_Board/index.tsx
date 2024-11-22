@@ -6,11 +6,11 @@ const {Option} = Select;
 import styles from './addeditboard.module.css';
 import {redColor, teal} from "../../const/colors.ts";
 import {addBoard, deleteBoard, updateBoard} from "../../services/boardService.ts";
-import {useGetBoards} from "../../context/GetBoardsContext.tsx";
+import {useContextGlobal} from "../../context/GlobalContext.tsx";
 
 const AddorEditBoardPage: React.FC = () => {
     const navigate = useNavigate();
-    const {getBoards} = useGetBoards();
+    const {getBoards} = useContextGlobal();
     const location = useLocation();
     const [isPrefaceEnabled, setIsPrefaceEnabled] = useState(true);
     const [form] = Form.useForm();

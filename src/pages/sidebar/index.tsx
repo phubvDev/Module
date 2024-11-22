@@ -5,13 +5,13 @@ import {MenuProps, Menu, Row, Col, Image} from 'antd'
 import {FaClipboardList, FaListUl, FaRegCircle} from "react-icons/fa";
 import {Link, useNavigate} from "react-router-dom";
 import imageAdmin from '../../assets/images/AdminLogo.png'
-import {useGetBoards} from "../../context/GetBoardsContext.tsx";
+import {useContextGlobal} from "../../context/GlobalContext.tsx";
 
 type MenuItems = Required<MenuProps>['items'][number]
 
 
 const Sidebar: React.FC = () => {
-    const {boards, getBoards} = useGetBoards();
+    const {boards, getBoards} = useContextGlobal();
     const navigate = useNavigate();
     const items: MenuItems[] = [
         {
