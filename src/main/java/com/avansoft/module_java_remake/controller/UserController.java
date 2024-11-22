@@ -37,6 +37,12 @@ public class UserController {
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/userId/{userId}")
+    public ResponseEntity<UserDTO> getUserByUserId(@PathVariable("userId") String userId) {
+        Optional<UserDTO> user = userService.findByUserId(userId);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDetails) {
         UserDTO updatedUser = userService.updateUser(id, userDetails);
