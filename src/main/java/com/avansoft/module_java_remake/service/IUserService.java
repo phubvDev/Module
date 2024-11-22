@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.List;
 
 public interface IUserService {
-        UserDTO createUser(UserDTO userDTO);
+        UserDTO registerUser(UserDTO userDTO);
         Optional<UserDTO> getUserById(Long id);
         UserDTO updateUser(Long id, UserDTO userDetails);
         void deleteUser(Long id);
@@ -15,4 +15,5 @@ public interface IUserService {
         List<UserDTO> getAllUsers();
         boolean checkPassword(String rawPassword, String encryptedPassword);
         Optional<UserDTO> findByUserId(String userId);
+        boolean checkUserExists(String userId);
 }
