@@ -2,10 +2,12 @@ import { Button, Input, Form } from 'antd';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/images/logo.png';
-import axios from 'axios';
+import {loginService} from "../../services/loginService.ts";
+import {useContextGlobal} from "../../context/GlobalContext.tsx";
 
 function Login() {
     const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
+    const {setUserId} = useContextGlobal();
 
     const handleLogin = async () => {
         const userId = (document.getElementById('exampleInputEmail1') as HTMLInputElement)?.value;
@@ -17,15 +19,15 @@ function Login() {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/avansoft/module/auth/login', {
-                userId: userId,
-                password,
-            });
+            const response = await loginService(userId,password);
 
             if (response.status === 200) {
                 alert('로그인 성공!');
                 // Lưu token vào localStorage để sử dụng sau này
-                localStorage.setItem('authToken', response.data);
+                console.log('token',response.data.token)
+                localStorage.setItem('authToken', response.data.token);
+                localStorage.setItem('userId',userId);
+                setUserId(userId);
                 navigate('/module/boards');
             } else {
                 alert('아이디 또는 비밀번호가 올바르지 않습니다.');

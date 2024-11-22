@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {BoardData, PostData} from "../../const/entity.ts";
 import {fetchBoardByBoardId} from "../../services/boardService.ts";
-import {Button, Card, Col, Divider, Row, Table, Typography} from 'antd'
+import {Button, Card, Col, Divider, Pagination, Row, Table, Typography} from 'antd'
 import styles from './post.module.css'
 import {successColor, thirstColor} from "../../const/colors.ts";
 import {FaCog} from 'react-icons/fa'
@@ -10,14 +10,19 @@ import {fetchPostsByBoardId} from "../../services/postService.ts";
 import PostGridComponent from "../../components/postgrid";
 import PostCardComponent from "../../components/postcard";
 import type {ColumnsType} from "antd/es/table";
+import {fetchLikeByPostId} from "../../services/likeService.ts";
 
 const {Title, Text} = Typography;
 const PostPage: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const boardId = searchParams.get("boardId");
+    const [currentPage,setCurrentPage] = useState<number>(1);
+    const [totalItems, setTotalItems] = useState<number>(0);
+    const [pageSize] = useState<number>(10);
     const [boardData, setBoardData] = useState<BoardData>();
     const [postData, setPostData] = useState<PostData[]>([]);
+    const [totalLikes, setTotalLikes] = useState<Record<number, number>>({});
 
     const getBoardByBoardId = async (boardId: string) => {
         try {
@@ -29,10 +34,12 @@ const PostPage: React.FC = () => {
         }
     }
 
-    const getPostByBoardId = async (boardId: number) => {
+    const getPostByBoardId = async (boardId: number,page:number) => {
         try {
-            const data = await fetchPostsByBoardId(boardId)
-            setPostData(data);
+            const data = await fetchPostsByBoardId(boardId,page-1,pageSize);
+            console.log("post data:",data);
+            setPostData(data.data);
+            setTotalItems(data.totalItems);
         } catch (error) {
             console.error("Error getPostByBoardId", error);
             return null;
@@ -47,16 +54,37 @@ const PostPage: React.FC = () => {
 
     useEffect(() => {
         if (boardData?.id !== undefined) {
-            getPostByBoardId(boardData.id);
+            getPostByBoardId(boardData.id,currentPage);
             console.log("BoardID", boardData.id);
 
         }
-    }, [boardData]);
+    }, [boardData,currentPage]);
     const prefaceText = boardData?.prefaceText?.split(",");
     const handleClickPrefaceText = (prefaceText: string) => {
         console.log("Click Preface Text", prefaceText);
     }
     console.log("Post data", postData);
+    console.log("totalItems", totalItems);
+
+    useEffect(() => {
+        const fetchLikesData = async () => {
+            const newLikeDataMap: Record<number, number> = {};
+            for (const post of postData) {
+                try {
+                    const [totalLike, totalDislike] = await fetchLikeByPostId(post.id);
+                    newLikeDataMap[post.id] = totalLike - totalDislike;
+                } catch (error) {
+                    console.error(`Error fetching like data for post ${post.id}:`, error);
+                    newLikeDataMap[post.id] = 0;
+                }
+            }
+            setTotalLikes(newLikeDataMap);
+        };
+
+        if (postData.length > 0) {
+            fetchLikesData();
+        }
+    }, [postData]);
     const columns: ColumnsType<PostData> = [
         {
             title: 'NO',
@@ -91,7 +119,7 @@ const PostPage: React.FC = () => {
             title: '추천',
             dataIndex: 'totalLike',
             key: 'totalLike',
-            render: () => 0
+            render: (_, record) => totalLikes[record.id] ?? 0,
         },
     ]
     const onRowClick = (record: PostData) => {
@@ -199,6 +227,15 @@ const PostPage: React.FC = () => {
                     )
                 }
             </Card>
+            {totalItems > 10 && (
+                <Pagination
+                    current={currentPage}
+                    total={totalItems}
+                    pageSize={pageSize}
+                    onChange={(page) => setCurrentPage(page)}
+                    style={{ marginTop: 16,textAlign: "center" }}
+                />
+            )}
         </div>
     )
 }

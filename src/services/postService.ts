@@ -1,9 +1,11 @@
 import axiosInstance from "./index.ts";
 
-export const fetchPostsByBoardId = async (boardId: number): Promise<any> => {
+export const fetchPostsByBoardId = async (boardId: number,page:number,size: number): Promise<any> => {
     try {
-        const response = await axiosInstance.get(`/posts/byBoardId/${boardId}`);
-        return response.data.data;
+        const response = await axiosInstance.get(`/posts/byBoardId/${boardId}`,{
+            params:{page,size},
+        });
+        return response.data;
     } catch (error) {
         console.error("Error fetching boards: ", error);
         throw error;

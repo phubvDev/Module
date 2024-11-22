@@ -1,18 +1,21 @@
-// GetBoardsContext.tsx
+// GlobalContext.tsx
 import React, {createContext, useContext, useCallback, ReactNode, useState} from "react";
 import { fetchBoards } from "../services/boardService.ts";
 
 import {BoardData} from "../const/entity.ts";
 
-type GetBoardsContextType = {
+type ContextType = {
     boards: BoardData[];
     getBoards: () => Promise<void>;
+    userId: string | null;
+    setUserId: (id:string) => void;
 };
 
-const GetBoardsContext = createContext<GetBoardsContextType | undefined>(undefined);
+const ProviderContext = createContext<ContextType | undefined>(undefined);
 
 export const GetBoardsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [boards, setBoards] = useState<BoardData[]>([]);
+    const [userId, setUserId] = useState<string | null>(null);
 
     const getBoards = useCallback(async () => {
         const data = await fetchBoards();
@@ -23,14 +26,14 @@ export const GetBoardsProvider: React.FC<{ children: ReactNode }> = ({ children 
 
 
     return (
-        <GetBoardsContext.Provider value={{ boards,getBoards}}>
+        <ProviderContext.Provider value={{ boards,getBoards,userId,setUserId}}>
             {children}
-        </GetBoardsContext.Provider>
+        </ProviderContext.Provider>
     );
 };
 
-export const useGetBoards = (): GetBoardsContextType => {
-    const context = useContext(GetBoardsContext);
+export const useContextGlobal = (): ContextType => {
+    const context = useContext(ProviderContext);
     if (!context) {
         throw new Error("useGetBoards must be used within a GetBoardsProvider");
     }
