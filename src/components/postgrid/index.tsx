@@ -24,7 +24,6 @@ const PostGridComponent: React.FC<PostGridProps> = ({postData}) => {
                 console.error("Error fetching likes:", error);
             }
         };
-
         fetchLikes();
     }, [postData.id]);
     const navigate = useNavigate();
