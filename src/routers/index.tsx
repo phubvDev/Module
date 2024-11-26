@@ -23,6 +23,10 @@ const AccessHistory = React.lazy(() => import('../pages/access-history'))
 const LevelChangeHistory = React.lazy(() => import('../pages/level-change-history'))
 const Privacy = React.lazy(() => import('../pages/privacy'))
 const Policy = React.lazy(() => import('../pages/policy'))
+const SnsSetting = React.lazy(() => import('../pages/sns-setting'))
+const Level = React.lazy(() => import('../pages/level'))
+const MailSmsSetting = React.lazy(() => import('../pages/mail-sms-setting'))
+
 
 const router = createBrowserRouter([
         {
@@ -94,6 +98,30 @@ const router = createBrowserRouter([
             element: (
                 <React.Suspense fallback={<Loading/>}>
                     <Policy/>
+                </React.Suspense>
+            )
+        },
+        {
+            path: '/module/sns-setting',
+            element: (
+                <React.Suspense fallback={<Loading/>}>
+                    <SnsSetting/>
+                </React.Suspense>
+            )
+        },
+        {
+            path: '/module/level',
+            element: (
+                <React.Suspense fallback={<Loading/>}>
+                    <Level/>
+                </React.Suspense>
+            )
+        },
+        {
+            path: '/module/mail-sms-setting',
+            element: (
+                <React.Suspense fallback={<Loading/>}>
+                    <MailSmsSetting/>
                 </React.Suspense>
             )
         },

@@ -33,9 +33,9 @@ const Sidebar: React.FC = () => {
                 { key: 'level-change-history', icon: <FaRegCircle />, label: <Link to="/module/level-change-history">운영자관리권한기록</Link> },
                 { key: 'privacy', icon: <FaRegCircle />, label: <Link to="/module/privacy">개인정보처리방침</Link> },
                 { key: 'policy', icon: <FaRegCircle />, label: <Link to="/module/policy">약관/개인정보</Link> },
-                { key: 'sns-login-settings', icon: <FaRegCircle />, label: <Link to="/sns-login-settings">SNS 로그인 설정</Link> },
-                { key: 'level-settings', icon: <FaRegCircle />, label: <Link to="/level-settings">LEVEL SETTING</Link> },
-                { key: 'mail-sms-settings', icon: <FaRegCircle />, label: <Link to="/mail-sms-settings">Mail/SMS 사용설정</Link> },
+                { key: 'sns-login-settings', icon: <FaRegCircle />, label: <Link to="/module/sns-setting">SNS 로그인 설정</Link> },
+                { key: 'level', icon: <FaRegCircle />, label: <Link to="/module/level">LEVEL SETTING</Link> },
+                { key: 'mail-sms-settings', icon: <FaRegCircle />, label: <Link to="/module/mail-sms-setting">Mail/SMS 사용설정</Link> },
             ],
         },
         {
