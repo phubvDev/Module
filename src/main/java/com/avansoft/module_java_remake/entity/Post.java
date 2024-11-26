@@ -1,15 +1,23 @@
 package com.avansoft.module_java_remake.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
+@ToString
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "posts")
 public class Post {
     @Id
@@ -62,24 +70,8 @@ public class Post {
     @Column(name = "images",columnDefinition = "TEXT")
     private String images;
 
-    @Override
-    public String toString() {
-        return "Post{" +
-                "id=" + id +
-                ", board=" + (board != null ? board.getId() : null) +
-                ", prefaceText='" + prefaceText + '\'' +
-                ", title='" + title + '\'' +
-                ", writerName='" + writerName + '\'' +
-                ", date=" + date +
-                ", detail='" + detail + '\'' +
-                ", attachment1='" + attachment1 + '\'' +
-                ", attachment2='" + attachment2 + '\'' +
-                ", attachment3='" + attachment3 + '\'' +
-                ", youtubeURL='" + youtubeURL + '\'' +
-                ", totalView=" + totalView +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", images='" + images + '\'' +
-                '}';
-    }
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonBackReference
+    private List<Comment> comments = new ArrayList<>();
+
 }
