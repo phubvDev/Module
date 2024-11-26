@@ -1,0 +1,53 @@
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.container {
+    flex: 1;
+    padding: 16px;
+    margin-left: 250px; /* Khoảng cách cho Sidebar */
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.header {
+    margin-bottom: 16px;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.content {
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form {
+    margin-top: 16px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.primary {
+    color: #007bff;
+}
+
+.danger {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.saveButton {
+    float: right;
+    margin-top: 16px;
+}

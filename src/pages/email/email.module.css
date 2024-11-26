@@ -1,0 +1,40 @@
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.container {
+    flex: 1;
+    padding: 16px;
+    margin-left: 250px; /* Đảm bảo không đè lên Sidebar */
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.header {
+    margin-bottom: 16px;
+}
+
+.card {
+    margin-top: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+.submitButton {
+    float: right;
+    margin-top: 16px;
+    background-color: #007bff;
+    border: none;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.submitButton:hover {
+    background-color: #0056b3;
+}

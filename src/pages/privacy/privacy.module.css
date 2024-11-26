@@ -1,0 +1,41 @@
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.container {
+    flex: 1;
+    padding: 16px;
+    margin-left: 250px; /* Khoảng cách cho Sidebar */
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.header {
+    margin-bottom: 16px;
+}
+
+.content {
+    margin-top: 16px;
+}
+
+.table {
+    margin-bottom: 16px;
+}
+
+.pagination {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.addButton {
+    margin-top: 16px;
+    float: right;
+}
+
+.actionButtons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}

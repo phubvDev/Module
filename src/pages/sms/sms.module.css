@@ -1,0 +1,66 @@
+/* Container tổng quát */
+.container {
+    display: grid;
+    grid-template-columns: 250px 1fr; /* Sidebar và nội dung */
+    height: 100vh;
+    background-color: #f9f9f9;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #343a40;
+    color: white;
+    padding: 16px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.sidebar a:hover {
+    color: #007bff;
+}
+
+/* Phần nội dung body */
+.bodyContent {
+    padding: 16px;
+    background-color: white;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card và header */
+.card-primary {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+}
+
+/* Radio Group */
+.radio-group {
+    display: flex;
+    gap: 16px;
+}
+
+/* Nút Submit */
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    float: right;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
