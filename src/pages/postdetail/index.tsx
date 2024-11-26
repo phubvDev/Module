@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from "react";
 import styles from './postdetail.module.css';
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Card, Col, Divider, Form, Input, Row, Skeleton, Typography} from 'antd'
+import {Button, Card, Col, Divider, Form, Input, message, Row, Skeleton, Typography} from 'antd'
 import {FaRegThumbsUp, FaRegThumbsDown} from "react-icons/fa";
 import {grayColor, primaryColor, secondaryColor} from "../../const/colors.ts";
 import {fetchBoardById} from "../../services/boardService.ts";
-import {BoardData, LikeData, UserData} from "../../const/entity.ts";
+import {BoardData, CommentData, LikeData, UserData} from "../../const/entity.ts";
 import {downloadFile} from "../../utils";
 import {fetchUserByUserId} from "../../services/userService.ts";
 import {fetchLikeByUserIdAndPostId, toggleLike} from "../../services/likeService.ts";
+import CommentComponent from "../../components/comment";
+import {addComment, fetchAllCommentsByPostId} from "../../services/commentService.ts";
 
 const {Title, Text} = Typography;
 
@@ -21,6 +23,8 @@ const PostDetailPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [board, setBoard] = useState<BoardData>();
+    const [commentData, setCommentData] = useState<CommentData[]>([]);
+    const [form] = Form.useForm();
     const {data} = location.state || {data: null};
     const userId = localStorage.getItem("userId");
     console.log("data post detail", data);
@@ -47,7 +51,51 @@ const PostDetailPage: React.FC = () => {
         }
     };
 
+    const getCommentsByPostId = async (postId : number) => {
+        try {
+            const response = await fetchAllCommentsByPostId(postId);
+            const commentsTree = buildCommentTree(response.map((comment:any) => ({ ...comment, replies: [] })));
+            setCommentData(commentsTree);
+        } catch (error) {
+            console.error("Error fetching like data:", error);
+        }
+    }
 
+    //hàm xây dựng cây comment từ mảng flat
+    const buildCommentTree = (comments: CommentData[]) => {
+        const map: { [key: number]: CommentData } = {};
+        const roots: CommentData[] = [];
+
+        comments.forEach(comment => {
+            //khởi tạo mảng replies nếu chưa có
+            map[comment.id!] = { ...comment, replies: comment.replies || [] }; //nếu chưa có replies, khởi tạo mảng rỗng
+        });
+
+        comments.forEach(comment => {
+            if (comment.parentId && map[comment.parentId]) {
+                //nếu có parentId và parentId tồn tại trong map, đưa comment vào children của comment cha
+                map[comment.parentId]?.replies?.push(comment);
+            } else {
+                //nếu không có parentId, comment này là root
+                roots.push(comment);
+            }
+        });
+
+        return roots;
+    };
+
+    const renderComment = (comment: CommentData, level: number = 0) => {
+        return (
+            <div key={comment.id} style={{ marginLeft: level * 20 }}>
+                <CommentComponent commentData={comment} key={comment.id} onAddComment={handleAddCommentReply}/>
+                {comment.replies && comment.replies.length > 0 && (
+                    <div style={{ marginLeft: 20 }}>
+                        {comment.replies.map(childComment => renderComment(childComment, level + 1))}
+                    </div>
+                )}
+            </div>
+        );
+    }
     useEffect(() => {
         getBoard();
     }, [])
@@ -71,8 +119,16 @@ const PostDetailPage: React.FC = () => {
         }
     }, [likeData?.liked]);
 
+    useEffect(() => {
+        if (data.id) {
+            getCommentsByPostId(data.id)
+        }
+    }, [data.id]);
+
     console.log("user", user);
     console.log("board", board);
+    console.log("comment", commentData);
+
     const handleToggleLikeDisLike = async (liked: boolean) => {
         if (!user || !data) {
             alert("Login Again, please!");
@@ -96,6 +152,34 @@ const PostDetailPage: React.FC = () => {
             }
         } catch (error) {
             console.error("Lỗi khi gửi trạng thái like/dislike:", error);
+        }
+    }
+
+    const handleAddCommentReply = (postId:number) => {
+        getCommentsByPostId(postId);
+    }
+
+    const handleToggleSubmit = async () => {
+
+        if (!user || !data) {
+            alert("Login Again, please!");
+            return;
+        }
+
+        try {
+            const content = await form.validateFields();
+            const commentData: CommentData = {
+                postId: data.id,
+                userId: user.id,
+                content: content.content,
+            }
+            await addComment(commentData);
+            message.success("Comment successfully added!");
+            getCommentsByPostId(data.id);
+            form.resetFields();
+        } catch (error) {
+            message.error("Comment error added!");
+            console.error("Lỗi khi submit comment:", error);
         }
     }
 
@@ -187,14 +271,19 @@ const PostDetailPage: React.FC = () => {
                 <Divider/>
 
                 <Card title={"댓글"} headStyle={{backgroundColor: primaryColor, color: "#fff"}} className={styles.card}>
-                    <Form layout={"vertical"}>
-                        <Form.Item label={"Admin"}>
+                    <Form layout={"vertical"} form={form}>
+                        <Form.Item label={userId} name={"content"} required={true}>
                             <Input.TextArea maxLength={500} rows={3} showCount/>
                         </Form.Item>
                     </Form>
                     <Row justify={"end"} style={{width: '100%'}}>
-                        <Button type={"primary"}>글쓰기</Button>
+                        <Button type={"primary"} onClick={handleToggleSubmit}>글쓰기</Button>
                     </Row>
+                    {Array.isArray(commentData) && commentData.length > 0 ? (
+                        commentData.map((comment) => (
+                           renderComment(comment)
+                        ))
+                    ) : null}
                 </Card>
                 <Row gutter={16} style={{marginTop: 16, marginBottom: 16}}>
                     <Col>

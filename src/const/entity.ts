@@ -74,3 +74,16 @@ export interface LikeData {
     createdAt?: string;
     updatedAt?: string;
 }
+
+export interface CommentData {
+    id?: number;
+    postId: number;
+    userId: number;
+    content: string;
+    hidden?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string;
+    parentId?: number;
+    replies?: CommentData[];
+}
