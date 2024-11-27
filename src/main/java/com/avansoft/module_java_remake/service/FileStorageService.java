@@ -12,8 +12,8 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService implements IFileStorageService {
-    private static final Dotenv dotenv = Dotenv.configure().filename("local.env").load();
-    private static final String BASE_DIRECTORY = dotenv.get("BASE_DIRECTORY_PATH");
+//    private static final Dotenv dotenv = Dotenv.configure().filename("local.env").load();
+    private static final String BASE_DIRECTORY = "/home/ubuntu/remake_module_java/uploads";
 
     @Override
     public String saveFile(MultipartFile file, String fileType) throws IOException {
