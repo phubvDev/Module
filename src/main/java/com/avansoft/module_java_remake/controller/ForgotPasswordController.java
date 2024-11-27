@@ -23,10 +23,10 @@ public class ForgotPasswordController {
         try {
             // Call service to handle password reset logic
             forgotPasswordService.handleForgotPassword(request);
-            return ResponseEntity.ok(new ResponseMessage("임시 비밀번호가 이메일로 발송되었습니다."));
+            return ResponseEntity.ok(new ResponseMessage("Mật khẩu tạm thời đã được gửi qua email."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseMessage("아이디와 이메일을 확인해주세요."));
+                    .body(new ResponseMessage("Vui lòng kiểm tra ID và email."));
         }
     }
 }

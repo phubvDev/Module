@@ -4,11 +4,12 @@ import com.avansoft.module_java_remake.dto.ForgotPasswordRequest;
 import com.avansoft.module_java_remake.entity.User;
 import com.avansoft.module_java_remake.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import java.util.Optional;
 import java.util.Random;
 
@@ -21,16 +22,13 @@ public class ForgotPasswordService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // Xử lý yêu cầu quên mật khẩu
     public void handleForgotPassword(ForgotPasswordRequest request) throws Exception {
         String userId = request.getUserId();
         String email = request.getEmail();
 
         // 1. Kiểm tra xem userId và email có tồn tại trong cơ sở dữ liệu không
         Optional<User> userOptional = userRepository.findByUserIdAndEmail(userId, email);
-
-        // Thay đổi isEmpty() thành !isPresent() để tương thích với Java 8
-        if (!userOptional.isPresent()) {
+        if (!userOptional.isPresent()) { // Dùng isPresent() thay vì isEmpty()
             throw new Exception("Invalid userId or email");
         }
 
@@ -54,20 +52,42 @@ public class ForgotPasswordService {
     // Tạo mật khẩu tạm thời 6 chữ số
     private String generateRandomPassword() {
         Random random = new Random();
-        return String.format("%06d", random.nextInt(1000000)); // Tạo mật khẩu 6 chữ số
+        return String.format("%06d", random.nextInt(1000000));
     }
 
-    // Gửi email với mật khẩu tạm thời
+    // Gửi email với mật khẩu tạm thời (HTML Email)
     private void sendTemporaryPasswordEmail(String email, String tempPassword) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(email);
-            message.setSubject("임시 비밀번호 안내");
-            message.setText("여러분의 임시 비밀번호는 " + tempPassword + " 입니다.");
-            mailSender.send(message);
-        } catch (Exception e) {
+            // Tạo đối tượng MimeMessage từ JavaMailSender
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+            // Sử dụng MimeMessageHelper để hỗ trợ gửi email HTML
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true); // true để hỗ trợ HTML content
+
+            // Đặt người nhận và chủ đề email
+            messageHelper.setTo(email);
+            messageHelper.setSubject("Hướng dẫn lấy lại mật khẩu");
+
+            // Nội dung email dưới dạng HTML (Tiếng Việt)
+            String htmlContent = "<html><body>"
+                    + "<h3>Chào bạn,</h3>"
+                    + "<p>Chúng tôi đã nhận được yêu cầu lấy lại mật khẩu cho tài khoản của bạn.</p>"
+                    + "<p>Mật khẩu tạm thời của bạn là: <strong>" + tempPassword + "</strong></p>"
+                    + "<p>Hãy sử dụng mật khẩu này để đăng nhập vào hệ thống và đổi mật khẩu của bạn.</p>"
+                    + "<p>Chúng tôi khuyến cáo bạn thay đổi mật khẩu ngay sau khi đăng nhập để đảm bảo bảo mật tài khoản.</p>"
+                    + "<p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.</p>"
+                    + "<p><i>Đội ngũ hỗ trợ khách hàng</i></p>"
+                    + "</body></html>";
+
+            // Cấu hình nội dung email là HTML
+            messageHelper.setText(htmlContent, true); // true để chỉ định đây là email HTML
+
+            // Gửi email
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to send email.");
+            throw new RuntimeException("Failed to send HTML email.");
         }
     }
 }
