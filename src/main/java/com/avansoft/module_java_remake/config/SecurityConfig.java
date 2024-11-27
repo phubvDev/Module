@@ -24,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/auth/login", "/api/avansoft/module/auth/login","/api/avansoft/module/users/register",
                         "/api/avansoft/module/email/create","/api/avansoft/module/users/check-username",
-                        "/api/avansoft/module/auth/forgot-password"
+                        "/api/avansoft/module/auth/forgot-password","/api/avansoft/module/auth/find-id"
                         ).permitAll() // Cho phép các endpoint login không cần xác thực
                 .anyRequest().authenticated() // Tất cả các request khác đều cần xác thực
                 .and()
