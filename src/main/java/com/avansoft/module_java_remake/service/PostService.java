@@ -169,6 +169,52 @@ public class PostService implements IPostService {
         }
     }
 
+    @Override
+    public ResponseEntity<CoreResponse<?>> getPostByBoardIdAndPrefaceText(Long boardId, String prefaceText, int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"id"));
+            Page<Post> posts = postRepository.findByBoardIdAndPrefaceText(boardId,prefaceText,pageable);
+
+            List<PostDTO> postDTOS = posts.stream()
+                    .map(post -> PostDTO.builder()
+                            .id(post.getId())
+                            .boardId(post.getBoard().getId())
+                            .prefaceText(post.getPrefaceText())
+                            .title(post.getTitle())
+                            .writerName(post.getWriterName())
+                            .date(post.getDate())
+                            .detail(post.getDetail())
+                            .attachment1(post.getAttachment1())
+                            .attachment2(post.getAttachment2())
+                            .attachment3(post.getAttachment3())
+                            .youtubeURL(post.getYoutubeURL())
+                            .thumbnail(post.getThumbnail())
+                            .totalView(post.getTotalView())
+                            .createdAt(post.getCreatedAt())
+                            .updatedAt(post.getUpdatedAt())
+                            .images(post.getImages())
+                            .build())
+                    .collect(Collectors.toList());
+            String message = postDTOS.isEmpty() ? "No posts found for this board" : "Posts found successfully";
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(CoreResponse.builder()
+                            .code(HttpStatus.OK.value())
+                            .message(message)
+                            .data(postDTOS)
+                            .totalItems(posts.getTotalElements())
+                            .totalPages(posts.getTotalPages())
+                            .currentPage(page)
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CoreResponse.builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message(e.getMessage())
+                            .data(null)
+                            .build());
+        }
+    }
+
     @Transactional
     @Override
     public ResponseEntity<CoreResponse<?>> addPost(PostDTO postDTO) {
@@ -284,10 +330,35 @@ public class PostService implements IPostService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(CoreResponse.builder()
                             .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                            .message("Failed to update board: " + e.getMessage())
+                            .message("Failed to update post: " + e.getMessage())
                             .data(null)
                             .build());
 
+        }
+    }
+
+    @Override
+    public ResponseEntity<CoreResponse<?>> updateTotalViews(Long id) {
+        try {
+            Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new Exception("Post not found"));
+
+            post.setTotalView(post.getTotalView() + 1);
+            postRepository.save(post);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(CoreResponse.builder()
+                            .code(HttpStatus.OK.value())
+                            .message("update total view successfully")
+                            .data(post)
+                            .build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CoreResponse.builder()
+                            .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .message("Failed to update post totalview: " + e.getMessage())
+                            .data(null)
+                            .build());
         }
     }
 
