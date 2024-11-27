@@ -15,12 +15,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${API_BASE_URL}/boards")
-@CrossOrigin(
-        origins = "http://13.124.14.236/",
-        allowedHeaders = {"Authorization", "Content-Type", "Accept"},
-        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
-        allowCredentials = "true"
-)
 public class BoardController {
     private final IBoardService boardService;
 
