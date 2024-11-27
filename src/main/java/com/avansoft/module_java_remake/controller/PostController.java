@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${API_BASE_URL}/posts")
-@CrossOrigin(origins = "http://localhost:5173/")
 public class PostController {
     private final IPostService postService;
 
@@ -92,6 +91,10 @@ public class PostController {
         return postService.updatePost(id, postDTO);
     }
 
+    @PatchMapping("/updatetotalview/{id}")
+    public ResponseEntity<CoreResponse<?>> updateTotalView(@PathVariable Long id) {
+        return postService.updateTotalViews(id);
+    }
     @DeleteMapping("/deletepost/{id}")
     public ResponseEntity<CoreResponse<?>> deletePost(@PathVariable("id") Long id) {
         return postService.deletePost(id);
