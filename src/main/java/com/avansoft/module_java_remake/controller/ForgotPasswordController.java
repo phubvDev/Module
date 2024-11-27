@@ -23,10 +23,10 @@ public class ForgotPasswordController {
         try {
             // Call service to handle password reset logic
             forgotPasswordService.handleForgotPassword(request);
-            return ResponseEntity.ok(new ResponseMessage("Mật khẩu tạm thời đã được gửi qua email."));
+            return ResponseEntity.ok(new ResponseMessage("success"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseMessage("Vui lòng kiểm tra ID và email."));
+                    .body(new ResponseMessage("error"));
         }
     }
 }
