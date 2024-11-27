@@ -8,6 +8,8 @@ import {useContextGlobal} from "../../context/GlobalContext.tsx";
 function Login() {
     const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
     const {setUserId} = useContextGlobal();
+    console.log("api url", import.meta.env.VITE_API_URL);
+
 
     const handleLogin = async () => {
         const userId = (document.getElementById('exampleInputEmail1') as HTMLInputElement)?.value;
