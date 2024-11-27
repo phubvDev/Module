@@ -8,5 +8,14 @@ export const fetchUserByUserId = async (userId: string):Promise<any> => {
         console.error("error", error);
         throw error;
     }
+}
 
+export const fetchAllUsers = async ():Promise<any> => {
+    try {
+        const response = await axiosInstance.get('/users');
+        return response;
+    } catch (error) {
+        console.error("error", error);
+        throw error;
+    }
 }

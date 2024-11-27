@@ -287,7 +287,7 @@ const PostDetailPage: React.FC = () => {
                 </Card>
                 <Row gutter={16} style={{marginTop: 16, marginBottom: 16}}>
                     <Col>
-                        <Button type={"primary"} style={{height: 40}} onClick={() => navigate(-1)}>리스트</Button>
+                        <Button type={"primary"} style={{height: 40}} onClick={() => navigate(-1)}>목록</Button>
                     </Col>
                     <Col>
                         <Button
