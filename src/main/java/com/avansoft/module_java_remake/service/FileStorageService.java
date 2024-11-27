@@ -1,5 +1,6 @@
 package com.avansoft.module_java_remake.service;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,8 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService implements IFileStorageService {
-    private static final String BASE_DIRECTORY = "/Users/buidangphu/JavaSpringBoot/remake_module_java/uploads";
+    private static final Dotenv dotenv = Dotenv.configure().filename("dev.env").load();
+    private static final String BASE_DIRECTORY = dotenv.get("BASE_DIRECTORY_PATH");
 
     @Override
     public String saveFile(MultipartFile file, String fileType) throws IOException {
