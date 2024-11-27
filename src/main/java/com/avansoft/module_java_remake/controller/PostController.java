@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${API_BASE_URL}/posts")
-@CrossOrigin(origins = "http://localhost:5173/")
+@CrossOrigin(origins = "http://13.124.14.236/")
 public class PostController {
     private final IPostService postService;
 
@@ -38,6 +38,15 @@ public class PostController {
     @GetMapping("/byBoardId/{boardId}")
     public ResponseEntity<CoreResponse<?>> getPostByBoardId(@PathVariable Long boardId,@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size ) {
         return postService.getPostByBoardId(boardId,page,size);
+    }
+
+    @GetMapping("/board/{boardId}/preface")
+    public ResponseEntity<CoreResponse<?>> getPostsByBoardIdAndPrefaceText(
+            @PathVariable Long boardId,
+            @RequestParam String prefaceText,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return postService.getPostByBoardIdAndPrefaceText(boardId, prefaceText, page, size);
     }
 
     @PostMapping("/addpost")
@@ -83,6 +92,10 @@ public class PostController {
         return postService.updatePost(id, postDTO);
     }
 
+    @PatchMapping("/updatetotalview/{id}")
+    public ResponseEntity<CoreResponse<?>> updateTotalView(@PathVariable Long id) {
+        return postService.updateTotalViews(id);
+    }
     @DeleteMapping("/deletepost/{id}")
     public ResponseEntity<CoreResponse<?>> deletePost(@PathVariable("id") Long id) {
         return postService.deletePost(id);

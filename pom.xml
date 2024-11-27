@@ -98,4 +98,18 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <envFile>dev.env</envFile>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <envFile>prod.env</envFile>
+            </properties>
+        </profile>
+    </profiles>
 </project>

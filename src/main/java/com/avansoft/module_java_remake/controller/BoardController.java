@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("${API_BASE_URL}/boards")
 @CrossOrigin(
-        origins = "http://localhost:5173",
+        origins = "http://13.124.14.236/",
         allowedHeaders = {"Authorization", "Content-Type", "Accept"},
         methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE},
         allowCredentials = "true"

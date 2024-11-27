@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("${API_BASE_URL}/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://13.124.14.236/")
 public class AuthController {
     private final IUserService userService;
     public AuthController(@Qualifier("userServiceImpl") IUserService userService) {
