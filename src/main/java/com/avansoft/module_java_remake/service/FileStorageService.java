@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService implements IFileStorageService {
-    private static final Dotenv dotenv = Dotenv.configure().filename("dev.env").load();
+    private static final Dotenv dotenv = Dotenv.configure().filename("local.env").load();
     private static final String BASE_DIRECTORY = dotenv.get("BASE_DIRECTORY_PATH");
 
     @Override
