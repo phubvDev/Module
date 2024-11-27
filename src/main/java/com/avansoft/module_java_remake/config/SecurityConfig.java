@@ -18,26 +18,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .cors().and()
-                .authorizeRequests()
-                .antMatchers("/auth/login","/api/avansoft/module/auth/login").permitAll()
-                .anyRequest().authenticated()
+                .cors() // Chỉ cần gọi một lần
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                        .sessionManagement()
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/auth/login", "/api/avansoft/module/auth/login","/api/avansoft/module/users/register",
+                        "/api/avansoft/module/email/create","/api/avansoft/module/users/check-username",
+                        "/api/avansoft/module/auth/forgot-password","/api/avansoft/module/auth/find-id"
+                        ).permitAll() // Cho phép các endpoint login không cần xác thực
+                .anyRequest().authenticated() // Tất cả các request khác đều cần xác thực
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // Thêm filter xác thực JWT
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS); // Chế độ Stateless để không sử dụng session
         System.out.println("Security Configuration applied successfully");
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); // Cung cấp PasswordEncoder để mã hóa mật khẩu
     }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
+        return new JwtAuthenticationFilter(); // Cung cấp JwtAuthenticationFilter để kiểm tra token
     }
-
 }
