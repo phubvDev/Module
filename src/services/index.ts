@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// import { baseUrl } from '../const/api.ts';
+import { baseUrl } from '../const/api.ts';
 
 const axiosInstance = axios.create({
-    // baseURL: "http://13.124.14.236:8386/api/avansoft/module",
+    baseURL: baseUrl,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
