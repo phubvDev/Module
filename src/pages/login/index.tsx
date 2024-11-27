@@ -2,12 +2,13 @@ import { Button, Input, Form } from 'antd';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from '../../assets/images/logo.png';
-import {loginService} from "../../services/loginService.ts";
-import {useContextGlobal} from "../../context/GlobalContext.tsx";
+import { loginService } from "../../services/loginService.ts";
+import { useContextGlobal } from "../../context/GlobalContext.tsx";
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google'; // Import CredentialResponse từ thư viện
 
 function Login() {
     const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
-    const {setUserId} = useContextGlobal();
+    const { setUserId } = useContextGlobal();
 
     const handleLogin = async () => {
         const userId = (document.getElementById('exampleInputEmail1') as HTMLInputElement)?.value;
@@ -19,14 +20,14 @@ function Login() {
         }
 
         try {
-            const response = await loginService(userId,password);
+            const response = await loginService(userId, password);
 
             if (response.status === 200) {
                 alert('로그인 성공!');
                 // Lưu token vào localStorage để sử dụng sau này
-                console.log('token',response.data.token)
+                console.log('token', response.data.token);
                 localStorage.setItem('authToken', response.data.token);
-                localStorage.setItem('userId',userId);
+                localStorage.setItem('userId', userId);
                 setUserId(userId);
                 navigate('/module/boards');
             } else {
@@ -36,6 +37,37 @@ function Login() {
             console.error('Login error:', error);
             alert('로그인 중 오류가 발생했습니다.');
         }
+    };
+
+    // Hàm xử lý đăng nhập qua Google
+    const handleGoogleLogin = async (credentialResponse: CredentialResponse) => { // Sử dụng CredentialResponse
+        const googleToken = credentialResponse.credential;
+
+        if (!googleToken) {
+            console.error('Google login failed: No credential received');
+            alert('Google 로그인 실패');
+            return;
+        }
+
+        try {
+            const res = await loginService('google', googleToken); // Gửi token Google lên server để xác thực
+
+            if (res.status === 200) {
+                alert('Google 로그인 성공!');
+                console.log('token', res.data.token);
+                localStorage.setItem('authToken', res.data.token);
+                navigate('/module/boards');
+            }
+        } catch (error) {
+            console.error('Google login error:', error);
+            alert('Google 로그인 중 오류가 발생했습니다.');
+        }
+    };
+
+    // Hàm xử lý lỗi khi đăng nhập Google (không tham số)
+    const handleGoogleError = () => {
+        console.error('Google login error occurred');
+        alert('Google 로그인 중 오류가 발생했습니다.');
     };
 
     return (
@@ -77,11 +109,15 @@ function Login() {
 
                 <div className="social-login">
                     <h3 className="text-center">or</h3>
+                    {/* Đăng nhập qua Google */}
+                    <GoogleLogin
+                        onSuccess={handleGoogleLogin} // Hàm xử lý đăng nhập thành công
+                        onError={handleGoogleError} // Hàm xử lý khi có lỗi
+                    />
                     <Button type="primary" size="small" style={{ width: '100%', marginBottom: '8px' }}>Facebook</Button>
-                    <Button type="primary" danger size="small" style={{ width: '100%', marginBottom: '8px' }}>Google</Button>
                     <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#1ec800', color: '#fff' }}>Naver</Button>
                     <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#fee500', color: '#000' }}>Kakao</Button>
-                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#6c757d', color: '#fff'}}>Apple</Button>
+                    <Button type="default" size="small" style={{ width: '100%', marginBottom: '8px', backgroundColor: '#6c757d', color: '#fff' }}>Apple</Button>
                 </div>
 
                 <div className="copyright" style={{ marginTop: '16px' }}>

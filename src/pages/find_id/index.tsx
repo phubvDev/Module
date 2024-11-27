@@ -34,7 +34,6 @@ function FindId() {
                 // Nếu thành công, thông báo và yêu cầu người dùng kiểm tra email
                 message.success('User ID đã được gửi đến email của bạn.');
                 goToLogin();
-
             } else {
                 // Nếu không tìm thấy, hiển thị thông báo lỗi
                 message.error('Không tìm thấy tài khoản với thông tin này.');
