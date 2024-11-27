@@ -6,7 +6,7 @@ import {Button, Card, Col, Divider, Pagination, Row, Table, Typography} from 'an
 import styles from './post.module.css'
 import {successColor, thirstColor} from "../../const/colors.ts";
 import {FaCog} from 'react-icons/fa'
-import {fetchPostsByBoardId} from "../../services/postService.ts";
+import {fetchPostByBoardIdAndPrefaceText, fetchPostsByBoardId, updateTotalView} from "../../services/postService.ts";
 import PostGridComponent from "../../components/postgrid";
 import PostCardComponent from "../../components/postcard";
 import type {ColumnsType} from "antd/es/table";
@@ -17,7 +17,7 @@ const PostPage: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const boardId = searchParams.get("boardId");
-    const [currentPage,setCurrentPage] = useState<number>(1);
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalItems, setTotalItems] = useState<number>(0);
     const [pageSize] = useState<number>(10);
     const [boardData, setBoardData] = useState<BoardData>();
@@ -34,10 +34,10 @@ const PostPage: React.FC = () => {
         }
     }
 
-    const getPostByBoardId = async (boardId: number,page:number) => {
+    const getPostByBoardId = async (boardId: number, page: number) => {
         try {
-            const data = await fetchPostsByBoardId(boardId,page-1,pageSize);
-            console.log("post data:",data);
+            const data = await fetchPostsByBoardId(boardId, page - 1, pageSize);
+            console.log("post data:", data);
             setPostData(data.data);
             setTotalItems(data.totalItems);
         } catch (error) {
@@ -54,14 +54,20 @@ const PostPage: React.FC = () => {
 
     useEffect(() => {
         if (boardData?.id !== undefined) {
-            getPostByBoardId(boardData.id,currentPage);
+            getPostByBoardId(boardData.id, currentPage);
             console.log("BoardID", boardData.id);
 
         }
-    }, [boardData,currentPage]);
+    }, [boardData, currentPage]);
     const prefaceText = boardData?.prefaceText?.split(",");
-    const handleClickPrefaceText = (prefaceText: string) => {
-        console.log("Click Preface Text", prefaceText);
+    const handleClickPrefaceText = async (boardId: number, prefaceText: string, page: number) => {
+        try {
+            const response = await fetchPostByBoardIdAndPrefaceText(boardId, prefaceText, page - 1, pageSize);
+            setPostData(response.data);
+            setTotalItems(response.totalItems);
+        } catch (error) {
+            console.error("Error getPrefaceText", error);
+        }
     }
     console.log("Post data", postData);
     console.log("totalItems", totalItems);
@@ -96,7 +102,7 @@ const PostPage: React.FC = () => {
             title: '제목',
             dataIndex: 'title',
             key: 'title',
-            render: (text,record) => (
+            render: (text, record) => (
                 <Row gutter={8}>
                     <Col><Text>[{record.date}]</Text></Col>
                     <Col><Text>{text}</Text></Col>
@@ -122,8 +128,14 @@ const PostPage: React.FC = () => {
             render: (_, record) => totalLikes[record.id] ?? 0,
         },
     ]
-    const onRowClick = (record: PostData) => {
-        navigate("/module/posts/" + record.id , {state: {data: record}});
+    const onRowClick = async (record: PostData) => {
+        try {
+            await updateTotalView(record.id);
+            navigate("/module/posts/" + record.id, {state: {data: record}});
+        } catch (error) {
+            console.error("Error updating total views", error);
+            throw error;
+        }
     }
     const titleCard = () => {
         return (
@@ -134,7 +146,10 @@ const PostPage: React.FC = () => {
                         {prefaceText?.map((item, index) => (
                             <span key={index}>
                                 <span style={{cursor: "pointer", fontWeight: 500}}
-                                      onClick={() => handleClickPrefaceText(item)}>{item}</span>
+                                      onClick={() => boardData?.id && handleClickPrefaceText(boardData.id, item, currentPage)}
+                                >
+                                    {item}
+                                </span>
                                 {index < prefaceText.length - 1 && (
                                     <span style={{margin: "0 8px"}}>|</span>
                                 )}
@@ -194,7 +209,7 @@ const PostPage: React.FC = () => {
                     <Button
                         type={"primary"}
                         style={{backgroundColor: successColor}}
-                        onClick={() => navigate(`/module/posts/create?boardId=${boardId}`,{state:{mode: "create"}})}
+                        onClick={() => navigate(`/module/posts/create?boardId=${boardId}`, {state: {mode: "create"}})}
                     >
                         글쓰기
                     </Button>
@@ -210,19 +225,19 @@ const PostPage: React.FC = () => {
                             pagination={false}
                             rowKey="id"
                             rowClassName={styles.row}
-                            scroll={{ x: "max-content" }}
+                            scroll={{x: "max-content"}}
                             onRow={(record) => ({onClick: () => onRowClick(record)})}
                         />
                     ) : boardData?.type === 2 ? (
-                        <Row gutter={[16,16]}>
-                            {postData.map((post,index) =>
-                                <PostGridComponent  key={index} postData={post}/>
+                        <Row gutter={[16, 16]}>
+                            {postData.map((post, index) =>
+                                <PostGridComponent key={index} postData={post}/>
                             )}
                         </Row>
 
                     ) : (
-                        postData.map((post,index) =>
-                        <PostCardComponent key={index} postData={post}/>
+                        postData.map((post, index) =>
+                            <PostCardComponent key={index} postData={post}/>
                         )
                     )
                 }
@@ -233,7 +248,7 @@ const PostPage: React.FC = () => {
                     total={totalItems}
                     pageSize={pageSize}
                     onChange={(page) => setCurrentPage(page)}
-                    style={{ marginTop: 16,textAlign: "center" }}
+                    style={{marginTop: 16, textAlign: "center"}}
                 />
             )}
         </div>

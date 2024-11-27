@@ -7,7 +7,19 @@ export const fetchPostsByBoardId = async (boardId: number,page:number,size: numb
         });
         return response.data;
     } catch (error) {
-        console.error("Error fetching boards: ", error);
+        console.error("Error fetching posts: ", error);
+        throw error;
+    }
+}
+
+export const fetchPostByBoardIdAndPrefaceText = async (boardId: number,prefaceText:string,page:number,size:number):Promise<any> => {
+    try {
+        const response = await axiosInstance.get(`/posts/board/${boardId}/preface`,{
+            params:{prefaceText,page,size},
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching posts: ", error);
         throw error;
     }
 }
@@ -35,6 +47,16 @@ export const updatePost = async (id: number,updatedData: FormData) : Promise<any
                 "Content-Type": "multipart/form-data",
             },
         });
+        return response.data.data;
+    } catch (error) {
+        console.error("Error updating post: ", error);
+        throw error;
+    }
+}
+
+export const updateTotalView = async (id:number) : Promise<any> => {
+    try {
+        const response = await axiosInstance.patch(`posts/updatetotalview/${id}`)
         return response.data.data;
     } catch (error) {
         console.error("Error updating post: ", error);

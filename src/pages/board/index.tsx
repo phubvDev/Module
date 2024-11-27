@@ -9,27 +9,49 @@ import {useContextGlobal} from "../../context/GlobalContext.tsx";
 
 const BoardPage: React.FC = () => {
     const [data, setData] = useState<BoardData[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [filteredData, setFilteredData] = useState<BoardData[]>([]);
     const navigate = useNavigate();
     const {userId} = useContextGlobal();
     console.log("userId", userId);
 
     const titleCard = () => {
         return (
-            <Row gutter={8} justify={"end"} style={{marginTop: 16}}>
+            <Row gutter={8} justify={"end"} style={{ marginTop: 16 }}>
                 <Col>
-                    <Input style={{height: 40, marginBottom: 16}}/>
+                    <Input
+                        style={{ height: 40, marginBottom: 16 }}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </Col>
                 <Col>
-                    <Button type={"primary"} style={{height: 40}}>검색</Button>
+                    <Button
+                        type={"primary"}
+                        style={{ height: 40 }}
+                        onClick={handleSearch}
+                    >
+                        검색
+                    </Button>
                 </Col>
             </Row>
         )
-    }
+    };
+    const handleSearch = () => {
+        if (searchTerm.trim() === '') {
+            setFilteredData(data);
+        } else {
+            const filtered = data.filter(board =>
+                board.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredData(filtered);
+        }
+    };
 
     useEffect(() => {
         const getBoards = async () => {
             const response = await fetchBoards();
-            setData(response.map((board: any) => ({
+            const boards = response.map((board: any) => ({
                 id: board.id,
                 boardId: board.boardId,
                 type: board.type,
@@ -43,7 +65,9 @@ const BoardPage: React.FC = () => {
                 write: board.write,
                 membershipSystem: board.membershipSystem,
                 status: board.status,
-            })));
+            }));
+            setData(boards);
+            setFilteredData(boards);
         };
         getBoards();
     }, []);
@@ -144,7 +168,8 @@ const BoardPage: React.FC = () => {
             <h1>게시판 목록</h1>
             <Card title={titleCard()}>
                 <Table columns={columns}
-                       dataSource={data}
+                       dataSource={filteredData
+                }
                        bordered={true}
                        rowKey="id"
                        rowClassName={styles.row}

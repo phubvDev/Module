@@ -1,17 +1,20 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Col, Row,Typography} from "antd";
+import {Button, Card, Col, Row, Typography} from "antd";
 import styles from "./postcard.module.css";
-import { useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {FaRegThumbsUp} from "react-icons/fa";
 import {grayColor} from "../../const/colors.ts";
 import {PostData} from "../../const/entity.ts";
 import {fetchLikeByPostId} from "../../services/likeService.ts";
+import {updateTotalView} from "../../services/postService.ts";
+
 const {Text} = Typography;
 
 interface PostCardProps {
-    postData : PostData;
+    postData: PostData;
 }
-const PostCardComponent:React.FC<PostCardProps> = ({postData}) => {
+
+const PostCardComponent: React.FC<PostCardProps> = ({postData}) => {
     const [likeCount, setLikeCount] = useState<number>(0);
     useEffect(() => {
         const fetchLikes = async () => {
@@ -30,7 +33,24 @@ const PostCardComponent:React.FC<PostCardProps> = ({postData}) => {
         <Card className={styles.card}>
             <Row align={"middle"} justify={"space-between"}>
                 <Col>
-                    <Text onClick={() => navigate(`/module/posts/${postData.id}`,{state: {data: postData}})} style={{fontSize: 18, fontWeight: "bold", color: "#292929",cursor:"pointer"}}>{postData?.title}</Text>
+                    <Text
+                        onClick={async () => {
+                            try {
+                                console.log("Post data id: ", postData.id);
+                                await updateTotalView(postData.id);
+                                navigate(`/module/posts/${postData.id}`, {state: {data: postData}});
+                            } catch (error) {
+                                console.error("Error updating total views:", error);
+                            }
+                        }}
+                        style={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "#292929",
+                            cursor: "pointer"
+                        }}
+                    >
+                        {postData?.title}</Text>
                 </Col>
                 <Col>
                     <Button icon={<FaRegThumbsUp/>}>{likeCount}</Button>
