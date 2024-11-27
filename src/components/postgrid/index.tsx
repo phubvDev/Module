@@ -6,6 +6,7 @@ import styles from './postgrid.module.css'
 import {useNavigate} from "react-router-dom";
 import {PostData} from "../../const/entity.ts";
 import {fetchLikeByPostId} from "../../services/likeService.ts";
+import {updateTotalView} from "../../services/postService.ts";
 
 const {Text} = Typography;
 
@@ -32,8 +33,19 @@ const PostGridComponent: React.FC<PostGridProps> = ({postData}) => {
             <Card className={styles.card}>
                 <Row align={"middle"} justify={"space-between"} wrap={false}>
                     <Col>
-                        <Text onClick={() => navigate(`/module/posts/${postData.id}`, {state: {data: postData}})}
-                              className={styles.text}>{postData?.title}</Text>
+                        <Text onClick={async () => {
+                            try {
+                                console.log("Post data id: ", postData.id);
+                                await updateTotalView(postData.id);
+                                navigate(`/module/posts/${postData.id}`, {state: {data: postData}});
+                            } catch (error) {
+                                console.error("Error updating total views:", error);
+                            }
+                        }}
+                              className={styles.text}
+                        >
+                            {postData?.title}
+                        </Text>
                     </Col>
                     <Col>
                         <Button icon={<FaRegThumbsUp/>} disabled={true}>{likeCount}</Button>

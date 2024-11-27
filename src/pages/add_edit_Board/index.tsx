@@ -7,22 +7,56 @@ import styles from './addeditboard.module.css';
 import {redColor, teal} from "../../const/colors.ts";
 import {addBoard, deleteBoard, updateBoard} from "../../services/boardService.ts";
 import {useContextGlobal} from "../../context/GlobalContext.tsx";
+import {UserData} from "../../const/entity.ts";
+import {fetchAllUsers} from "../../services/userService.ts";
+const readandWriteData = [
+    {id:"",name:"전체"},
+    {id:"1",name:"일반회원-회원에 가입을 하면 level 1 입니다."},
+    {id:"8",name:"Level.8"},
+    {id:"9",name:"super admin"}
+]
 
 const AddorEditBoardPage: React.FC = () => {
     const navigate = useNavigate();
     const {getBoards} = useContextGlobal();
     const location = useLocation();
-    const [isPrefaceEnabled, setIsPrefaceEnabled] = useState(true);
+    const [isPrefaceEnabled, setIsPrefaceEnabled] = useState(false);
+    const [users, setUsers] = useState<UserData[]>([]);
     const [form] = Form.useForm();
     const {mode, data} = location.state || {mode: 'create', data: null};
+    console.log("data board",data)
 
     useEffect(() => {
-        if (mode === 'edit' && data) {
-            form.setFieldsValue(data);
+        if (mode === "edit" && data) {
+            const formattedData = {
+                ...data,
+                read: data.read ?? "",
+                write: data.write ?? "",
+            };
+            form.setFieldsValue(formattedData);
+            setIsPrefaceEnabled(data.preface);
         }
     }, [mode, data, form]);
+
+    const getAllUsers = async () => {
+        try {
+            const response = await fetchAllUsers();
+            setUsers(response.data);
+        } catch (error) {
+            console.error("Error getAllUsers", error);
+        }
+    }
+
+    useEffect(() => {
+        getAllUsers();
+    }, []);
+
     const handlePrefaceChange = (e: any) => {
-        setIsPrefaceEnabled(e.target.value === 1);
+        const value = e.target.value;
+        setIsPrefaceEnabled(value === 1);
+        if (value === 0) {
+            form.setFieldsValue({ prefaceText: "" });
+        }
     };
 
     const handleSubmit = async () => {
@@ -57,6 +91,7 @@ const AddorEditBoardPage: React.FC = () => {
         }
     }
 
+    console.log("all users",users);
     return (
         <div className={styles.container}>
             <h1>멀티 게시판 관리</h1>
@@ -64,15 +99,21 @@ const AddorEditBoardPage: React.FC = () => {
                 <Form
                     layout="vertical"
                     form={form}
-                    initialValues={{
-                        type: "1",
-                        preface: 1,
-                        manager_id: "2",
-                        read: "",
-                        write: "",
-                        membership_system: 1,
-                        status: "1",
-                    }}
+                    initialValues={ mode === "create"
+                        ? {
+                            type: "1",
+                            preface: 0,
+                            prefaceText: "",
+                            manager_id: "",
+                            read: "",
+                            write: "",
+                            membership_system: 1,
+                            status: "1",
+                        }
+                        : {
+                            ...data,
+                            preface: data.preface ? 1 : 0,
+                        }}
                 >
                     <Form.Item label="게시판 타입" name="type" rules={[{required: true}]}>
                         <Select style={{width: "100%"}}>
@@ -92,45 +133,41 @@ const AddorEditBoardPage: React.FC = () => {
 
                     <Form.Item label="말머리" name="preface">
                         <Radio.Group onChange={handlePrefaceChange}>
-                            <Radio value={1}>사용</Radio>
+                            <Radio value={1}>사용사용</Radio>
                             <Radio value={0}>미사용</Radio>
                         </Radio.Group>
+                    </Form.Item>
+                    <Form.Item name={"prefaceText"} rules={[{ required: isPrefaceEnabled, message: "텍스트를 입력하세요." }]}>
                         <Input
                             placeholder="'구분은 ', '로 합니다'."
-                            style={{marginTop: "8px", display: "block"}}
                             disabled={!isPrefaceEnabled}
                         />
                     </Form.Item>
-
-                    <Form.Item label="말머리 텍스트" name="prefaceText">
-                        <Input/>
-                    </Form.Item>
-
                     <Form.Item label="관리자" name="managerId" rules={[{required: true, message: "관리자를 선택하세요"}]}>
-                        <Select style={{width: "100%"}} showSearch optionFilterProp="children">
-                            <Option value="2">N</Option>
-                            <Option value="4">John Doe</Option>
-                            <Option value="5">Jane Smith</Option>
-                            <Option value="6">Alice Johnson</Option>
-                            <Option value="7">Duy</Option>
+                        <Select style={{width: "100%"}} showSearch optionFilterProp="children" notFoundContent="사용자가 없습니다">
+                            {users.length > 0
+                                ? users.map((user) => (
+                                    <Option key={user.id} value={user.id}>
+                                        {user.name}
+                                    </Option>
+                                ))
+                                : null}
                         </Select>
                     </Form.Item>
 
                     <Form.Item label="읽기권한" name="read">
-                        <Select style={{width: "100%"}}>
-                            <Option value="">전체</Option>
-                            <Option value="1">일반회원-회원에 가입을 하면 level 1 입니다.</Option>
-                            <Option value="8">Level.8</Option>
-                            <Option value="9">super admin</Option>
+                        <Select style={{width: "100%"}} optionFilterProp="children">
+                            {readandWriteData.map((item) => (
+                                <Option key={item.id} value={item.id}>{item.name}</Option>
+                            ))}
                         </Select>
                     </Form.Item>
 
                     <Form.Item label="쓰기권한" name="write">
-                        <Select style={{width: "100%"}}>
-                            <Option value="">전체</Option>
-                            <Option value="1">일반회원-회원에 가입을 하면 level 1 입니다.</Option>
-                            <Option value="8">Level.8</Option>
-                            <Option value="9">super admin</Option>
+                        <Select style={{width: "100%"}} optionFilterProp="children">
+                            {readandWriteData.map((item) => (
+                                <Option key={item.id} value={item.id}>{item.name}</Option>
+                            ))}
                         </Select>
                     </Form.Item>
 
