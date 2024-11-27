@@ -24,7 +24,6 @@ public class BoardController {
     }
 
     @GetMapping()
-    @CrossOrigin(origins = "http://localhost:5173")
     public CoreResponse<?> getBoards() {
         return boardService.getAllBoards();
     }
