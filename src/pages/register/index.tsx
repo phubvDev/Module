@@ -70,7 +70,7 @@ const Register: React.FC = () => {
         }
 
         try {
-            await axios.post('http://13.124.14.236:8386/api/avansoft/module/email/create', {email});
+            await axios.post('http://localhost:8080/api/avansoft/module/email/create', {email});
             message.success('Mã xác minh đã được gửi đến email của bạn');
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -93,7 +93,7 @@ const Register: React.FC = () => {
         }
 
         try {
-            const response = await axios.post('http://13.124.14.236:8386/api/avansoft/module/verify-code', {
+            const response = await axios.post('http://localhost:8080/api/avansoft/module/verify-code', {
                 email,
                 code: verificationCode,
             });
@@ -141,7 +141,7 @@ const Register: React.FC = () => {
 
     const checkUserIdExists = async (userId: string) => {
         try {
-            const response = await axios.post('http://13.124.14.236:8386/api/avansoft/module/users/check-username', { userId });
+            const response = await axios.post('http://localhost:8080/api/avansoft/module/users/check-username', { userId });
             return response.data.exists; // Kiểm tra nếu userId đã tồn tại
         } catch {
             message.error('Lỗi khi kiểm tra userId. Vui lòng thử lại.');
@@ -182,7 +182,7 @@ const Register: React.FC = () => {
             }
 
             // Gửi dữ liệu đăng ký lên backend
-            await axios.post('http://13.124.14.236:8386/api/avansoft/module/users/register', values);
+            await axios.post('http://localhost:8080/api/avansoft/module/users/register', values);
             message.success('Đăng ký thành công!');
 
             // Reset các trường trong form
