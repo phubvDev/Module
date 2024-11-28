@@ -15,7 +15,7 @@ interface Board {
 }
 
 const Sidebar: React.FC = () => {
-    const { boards, getBoards } = useContextGlobal();
+    const { boards = [], getBoards, } = useContextGlobal(); // Giả sử boards là mảng rỗng nếu chưa có dữ liệu
     const navigate = useNavigate();
 
     // Menu items
@@ -43,11 +43,11 @@ const Sidebar: React.FC = () => {
             icon: <FaListUl className={styles.menuItemIcon} />,
             label: "멀티 게시판 목록",
             style: { width: "250px" },
-            children: boards.map((board: Board) => ({
+            children: boards.length > 0 ? boards.map((board: Board) => ({
                 key: board.boardId,
                 icon: <FaRegCircle />,
                 label: <Link to={`/module/posts?boardId=${board.boardId}`}>{board.name}</Link>
-            })),
+            })) : [{ key: 'loading', icon: <FaRegCircle />, label: "Loading..." }] // Hiển thị thông báo khi chưa có boards
         },
         {
             key: '2',
