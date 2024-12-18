@@ -13,7 +13,7 @@ axiosInstance.interceptors.request.use(
         const token = localStorage.getItem('authToken');
         console.log("token", token);
         if (token) {
-            config.headers['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczMjkzNjg4MCwiaWF0IjoxNzMyMDcyODgwfQ.Fe2yTmbdjdJVFbZVr8PkZQ5V6bPCkMvQ4N6zF-0hJjc`;
+            config.headers['Authorization'] = `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTczNTM2ODE2MiwiaWF0IjoxNzM0NTA0MTYyfQ.7e9zbvrOfiIamfqu_VpOjjhLDiwqV_wyhZL4pjc-zH4`;
         }
         return config;
     },
