@@ -12,12 +12,9 @@ public class WebConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:5173"); // Cho phép origin của frontend
-        config.addAllowedOrigin("http://13.124.14.236"); // Cho phép origin của frontend
-        config.addAllowedMethod("*"); // Cho phép tất cả các method (GET, POST, etc.)
-
         // Cấu hình CORS, cho phép origin của frontend
-        config.addAllowedOrigin("http://localhost:5173"); // Chỉ cho phép truy cập từ localhost:5173 (frontend)
+        config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("http://13.124.14.236");// Chỉ cho phép truy cập từ localhost:5173 (frontend)
         config.addAllowedMethod("*"); // Cho phép tất cả các phương thức HTTP (GET, POST, PUT, DELETE...)
         config.addAllowedHeader("*"); // Cho phép tất cả các header
         config.setAllowCredentials(true); // Cho phép gửi cookie trong request (nếu cần)
